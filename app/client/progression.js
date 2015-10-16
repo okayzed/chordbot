@@ -1,9 +1,44 @@
 
 var major_progression = [ "I", "ii", "iii", "IV", "V", "vi", "vii" ];
 module.exports = {
+  get_chord_for_function: function(func, root) {
+    var acc = -1;
+    var chord_name = "???";
+    bootloader.js(["app/client/grammar", "app/client/analysis"], function() {
+      var grammar = bootloader.require("app/client/grammar");
+      var analysis = bootloader.require("app/client/analysis");
+
+      acc = 0;
+      while (func.match(/b/)) {
+        func = func.replace(/b/, '');
+        acc--;
+      }
+      while (func.match(/#/)) {
+        func = func.replace(/#/, '');
+        acc++;
+      }
+
+      // now we expect it to be in form [vViI]7?
+      var match = func.match(/[VviI]+7?/);
+      if (match.indexOf("7") !== -1) {
+        // its a 7th chord!
+        func.replace("7", "");
+      }
+
+      var chord_key = analysis.get_chord_key(root);
+
+      chord_name = grammar.FUNCTIONS_FOR_KEY[chord_key][func];
+
+
+    });
+
+    return chord_name;
+
+    
+
+  },
   determine_function: function(chord, root) {
     if (typeof(chord) === "string") {
-      console.log("CHORD", chord);
       chord = window.teoria.chord(chord);
     }
     var chord_root = chord.simple()[0];

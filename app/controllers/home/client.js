@@ -39,11 +39,8 @@ function get_chords_from_str(str) {
 
 module.exports = {
   click_handler_uno: function() {
-    console.log("Handling a click");
   }, 
   init: function() {
-    console.log("Created controller");
-
     // Do all the processing here... 
     _.each(read_progressions, function(line) {
       var chord_list = get_chords_from_str(line);

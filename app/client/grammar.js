@@ -14,16 +14,23 @@ var CHORDS_IN_KEY = {};
 // WHAT ITS FUNCTION IS
 var KEYS_HAVE_CHORD = {};
 
+var FUNCTIONS_FOR_KEY = {};
+
 
 function build_chords_for_key(key) {
   var major_flavors = "MmmMMmm";
   var minor_flavors = "mmMmMMm";
+
+  var major_functions = "I ii iii IV V vi vii".split(" ");
+  var minor_functions = "Im ii III iv v VI vii".split(" ");
 
   var major_key = key + "M";
   var minor_key = key + "m";
 
   var major_chords = [];
   var minor_chords = [];
+
+  FUNCTIONS_FOR_KEY[key] = {};
 
   var major_scale = teoria.note(key).scale('major').simple();
   _.each(major_scale, function(note, index) {
@@ -35,6 +42,8 @@ function build_chords_for_key(key) {
     }
 
     KEYS_HAVE_CHORD[flavored_note][major_key] = index + 1;
+
+    FUNCTIONS_FOR_KEY[key][major_functions[index]] = flavored_note;
   });
 
   var minor_scale = teoria.note(key).scale('minor').simple();
@@ -47,6 +56,7 @@ function build_chords_for_key(key) {
     }
 
     KEYS_HAVE_CHORD[flavored_note][minor_key] = index + 1;
+    FUNCTIONS_FOR_KEY[key][minor_functions[index]] = flavored_note;
   });
 
   CHORDS_IN_KEY[major_key] = major_chords;
@@ -187,5 +197,8 @@ update_grammar_matrix(MINOR_GRAMMAR, MINOR_GRAMMAR_MATRIX, MINOR_GRAMMAR_CLASSES
 
 module.exports = {
   check_progression_grammar: check_progression_grammar,
-  get_progression_candidates: get_progression_candidates
+  get_progression_candidates: get_progression_candidates,
+  KEYS_WITH_CHORD: KEYS_HAVE_CHORD,
+  CHORDS_IN_KEY: CHORDS_IN_KEY,
+  FUNCTIONS_FOR_KEY: FUNCTIONS_FOR_KEY
 }
