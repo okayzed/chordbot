@@ -22,6 +22,7 @@ var read_progressions = [
 var analysis = require("app/client/analysis");
 var Progression = require("app/client/progression");
 var normal = require("app/client/normal");
+var generator = require("app/client/generator");
 
 
 function get_chords_from_str(str) {
@@ -82,13 +83,13 @@ module.exports = {
       });
 
       console.log(sorted_progressions);
-      _.each(sorted_progressions, function(prog) {
-        console.log("HARMONIOUSNESS", analysis.get_progression_harmoniousness(prog.mod_labeling), "BREAKS", analysis.check_progression_grammar(prog.mod_labeling));
-      });
+      var prog = sorted_progressions[0];
+      console.log("HARMONIOUSNESS", analysis.get_progression_harmoniousness(prog.mod_labeling), "BREAKS", analysis.check_progression_grammar(prog.mod_labeling));
+
+      console.log("FINDING MODULATION OPPORTUNITIES");
+      generator.get_possible_variations(prog);
 
 
     });
-
-
   }
 };

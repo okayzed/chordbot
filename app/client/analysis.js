@@ -236,6 +236,13 @@ module.exports = {
   },
   decide_progression_likeliness: decide_progression_likeliness,
   get_progression_harmoniousness: get_progression_harmoniousness,
-  check_progression_grammar: check_progression_grammar
+  check_progression_grammar: check_progression_grammar,
+  get_chord_key: function(chord_ish) {
+    if (typeof(chord_ish) === "string") {
+      chord_ish = teoria.chord(chord_ish);
+    }
+
+    return chord_ish.root.name() + chord_ish.root.accidental();
+  }
 };
 

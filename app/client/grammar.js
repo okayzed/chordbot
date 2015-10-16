@@ -9,6 +9,9 @@ var MAJOR_GRAMMAR_CLASSES = {};
 var MINOR_GRAMMAR_CLASSES = {};
 
 var CHORDS_IN_KEY = {};
+
+// KEYS HAVE CHORD IS A LOOKUP THAT SHOWS WHAT OTHER KEYS CONTAIN A CHORD AND
+// WHAT ITS FUNCTION IS
 var KEYS_HAVE_CHORD = {};
 
 
@@ -19,26 +22,66 @@ function build_chords_for_key(key) {
   var major_key = key + "M";
   var minor_key = key + "m";
 
-  for (var i = 0; i < major_flavors.length; i++) {
-     
-  }
+  var major_chords = [];
+  var minor_chords = [];
+
+  var major_scale = teoria.note(key).scale('major').simple();
+  _.each(major_scale, function(note, index) {
+    var flavored_note = note + major_flavors[index];
+    major_chords.push(flavored_note);
+
+    if (!KEYS_HAVE_CHORD[flavored_note]) {
+      KEYS_HAVE_CHORD[flavored_note] = {};
+    }
+
+    KEYS_HAVE_CHORD[flavored_note][major_key] = index + 1;
+  });
+
+  var minor_scale = teoria.note(key).scale('minor').simple();
+  _.each(minor_scale, function(note, index) {
+    var flavored_note = note + minor_flavors[index];
+    minor_chords.push(flavored_note);
+
+    if (!KEYS_HAVE_CHORD[flavored_note]) {
+      KEYS_HAVE_CHORD[flavored_note] = {};
+    }
+
+    KEYS_HAVE_CHORD[flavored_note][minor_key] = index + 1;
+  });
+
+  CHORDS_IN_KEY[major_key] = major_chords;
+  CHORDS_IN_KEY[minor_key] = minor_chords;
+
 }
 
 function build_chords_in_keys() {
-  _.each("ABCDEFG", function(key) {
+  _.each("abcdefg", function(key) {
     build_chords_for_key(key);
+    build_chords_for_key(key + "b");
+    build_chords_for_key(key + "#");
   });
 
 }
 
-function update_grammar_matrix(grammar, grammar_matrix) {
+build_chords_in_keys();
+
+function update_grammar_matrix(grammar, grammar_matrix, grammar_classes) {
   var tokens = grammar.split("|");
   tokens.reverse();
 
   _.each(tokens, function(token, index) {
     var functions = token.split(" ");
     _.each(functions, function(func) {
+      if (!func.replace(" ", "")) {
+        return;
+      }
+
       grammar_matrix[func] = index;
+      if (!grammar_classes[index]) {
+        grammar_classes[index] = {};
+      }
+
+      grammar_classes[index][func] = 1;
 
     });
   });
@@ -58,11 +101,11 @@ function check_grammar(prev_chord, chord, matrix) {
   return 0;
 }
 
-function add_grammar_to_candidates(candidates, func, grammar_matrix) {
+function add_grammar_to_candidates(candidates, func, grammar_matrix, grammar_classes) {
   if (grammar_matrix[func]) {
     var index = grammar_matrix[func];
-    for (var i = Math.max(index-3, 0); i < index-1; i++) {
-      _.each(grammar_matrix[i], function(candidate) {
+    for (var i = Math.max(index-2, 0); i < index; i++) {
+      _.each(grammar_classes[i], function(is_true, candidate) {
         candidates[candidate] = true;
       });
     }
@@ -74,14 +117,22 @@ function get_progression_candidates(chord, key) {
   var candidates = {};
   var func = Progression.determine_function(chord, key);
 
-  func = func.replace("m", "").replace("M", "");
+  var stripped_func = func.replace("m", "").replace("M", "");
 
-  add_grammar_to_candidates(candidates, func, MAJOR_GRAMMAR_MATRIX);
-  add_grammar_to_candidates(candidates, func, MINOR_GRAMMAR_MATRIX);
+  add_grammar_to_candidates(candidates, func, MAJOR_GRAMMAR_MATRIX, MAJOR_GRAMMAR_CLASSES);
+  add_grammar_to_candidates(candidates, func, MINOR_GRAMMAR_MATRIX, MINOR_GRAMMAR_CLASSES);
+  add_grammar_to_candidates(candidates, stripped_func, MAJOR_GRAMMAR_MATRIX, MAJOR_GRAMMAR_CLASSES);
+  add_grammar_to_candidates(candidates, stripped_func, MINOR_GRAMMAR_MATRIX, MINOR_GRAMMAR_CLASSES);
 
-  if (func == "I") {
+  if (func === "I") {
+    _.each(MAJOR_GRAMMAR_MATRIX, function(val, key) {
+      candidates[key] = 1;
+    });
 
-  } else if (func == "Im") {
+  } else if (func === "Im") {
+    _.each(MINOR_GRAMMAR_MATRIX, function(val, key) {
+      candidates[key] = 1;
+    });
 
   }
 
@@ -131,8 +182,8 @@ function check_progression_grammar(labeling) {
 
 }
 
-update_grammar_matrix(MAJOR_GRAMMAR, MAJOR_GRAMMAR_MATRIX);
-update_grammar_matrix(MINOR_GRAMMAR, MINOR_GRAMMAR_MATRIX);
+update_grammar_matrix(MAJOR_GRAMMAR, MAJOR_GRAMMAR_MATRIX, MAJOR_GRAMMAR_CLASSES);
+update_grammar_matrix(MINOR_GRAMMAR, MINOR_GRAMMAR_MATRIX, MINOR_GRAMMAR_CLASSES);
 
 module.exports = {
   check_progression_grammar: check_progression_grammar,

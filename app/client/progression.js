@@ -2,6 +2,10 @@
 var major_progression = [ "I", "ii", "iii", "IV", "V", "vi", "vii" ];
 module.exports = {
   determine_function: function(chord, root) {
+    if (typeof(chord) === "string") {
+      console.log("CHORD", chord);
+      chord = window.teoria.chord(chord);
+    }
     var chord_root = chord.simple()[0];
     var teoria = window.teoria;
 
@@ -11,7 +15,7 @@ module.exports = {
     var interval = teoria.Interval.between(teoria.note(chord_root), teoria.note(root));
 
     var progression_type = major_progression;
-    var prog_name = progression_type[interval.number() - 1];
+    var prog_name = progression_type[(interval.number() - 1) % 7];
     var desired_quality = prog_name.toUpperCase() === prog_name;
     if (desired_quality) {
       desired_quality = "M";
