@@ -4,6 +4,45 @@ var major_progression = [ "I", "ii", "iii", "IV", "V", "vi", "vii" ];
 var minor_progression = [ "Im", "ii", "iii", "iv", "V", "VI", "vii" ];
 var Progression = require("app/client/progression");
 
+function get_flavored_key(chord_ish, flavor) {
+  if (typeof(chord_ish) === "string") {
+    chord_ish = teoria.chord(chord_ish);
+  }
+
+  if (chord_ish.root) {
+    if (!flavor) {
+      var quality = chord_ish.quality();
+      flavor = "M";
+      if (quality === "minor") {
+        flavor = "m";
+      }
+    }
+
+    return chord_ish.root.name() + chord_ish.root.accidental() + flavor;
+  }
+
+  flavor = flavor || "M";
+  return chord_ish.name() + chord_ish.accidental() + flavor;
+
+
+
+}
+
+function Counter() {
+  var count = {};
+  return {
+    add: function(key, inc) {
+      inc = inc || 1;
+      count[key] = (count[key] || 0) + inc;
+
+    },
+    value: function(key) {
+      return count[key] || 0;
+    },
+    raw: count
+  }
+}
+
 function compare_likeliness(a, b) {
   return decide_progression_likeliness(b) - decide_progression_likeliness(a);
 }
@@ -237,12 +276,60 @@ module.exports = {
   decide_progression_likeliness: decide_progression_likeliness,
   get_progression_harmoniousness: get_progression_harmoniousness,
   check_progression_grammar: check_progression_grammar,
+  chord_is_major: function(chord_ish) {
+    var name = module.exports.get_flavored_key(chord_ish);
+    if (name.match("M")) {
+      return true;
+    }
+  },
   get_chord_key: function(chord_ish) {
     if (typeof(chord_ish) === "string") {
       chord_ish = teoria.chord(chord_ish);
     }
 
     return chord_ish.root.name() + chord_ish.root.accidental();
+  },
+  get_flavored_key: get_flavored_key,
+  get_chord_histograms: function(progression) {
+    var key_hist = new Counter();
+    var implied_hist = new Counter();
+    var weighted_hist = new Counter();
+    var implied_weighted = new Counter();
+
+    var relative;
+
+    function get_hists(chord_list) {
+      _.each(chord_list, function(chord) {
+        // TODO: normalize the chord
+        // histogram of chord keys
+
+        if (chord.quality() == "major" || chord.quality() == "dominant") {
+          key_hist.add(get_flavored_key(chord, "M"));
+          // add the implied minor to the implied_hist...
+          relative = chord.root.interval("M6");
+          implied_hist.add(get_flavored_key(relative, "m"));
+        } else {
+          key_hist.add(get_flavored_key(chord, "m"));
+          relative = chord.root.interval("m3");
+          implied_hist.add(get_flavored_key(relative, "m"));
+        }
+      });
+
+      return {
+        direct: key_hist,
+        implied: implied_hist
+      };
+
+    }
+
+
+
+    return {
+      weighted: get_hists(progression.chord_list),
+      unweighted: get_hists(_.uniq(progression.chord_list))
+
+    };
+
   }
 };
 
