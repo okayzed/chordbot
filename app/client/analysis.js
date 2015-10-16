@@ -2,7 +2,7 @@ var grammar = require("app/client/grammar");
 
 var major_progression = [ "I", "ii", "iii", "IV", "V", "vi", "vii" ];
 var minor_progression = [ "Im", "ii", "iii", "iv", "V", "VI", "vii" ];
-
+var Progression = require("app/client/progression");
 
 function compare_likeliness(a, b) {
   return decide_progression_likeliness(b) - decide_progression_likeliness(a);
@@ -60,6 +60,9 @@ function get_progression_harmoniousness(labeling) {
 
       var max_re = new RegExp(maj_pattern);
       if (max_re.test(label)) {
+        if (label === maj_pattern.replace("7", "")) {
+          maj_points += 1;
+        }
         maj_points += MAJ_POINTS[MAJ_KEYS[i]];
         break;
       }
@@ -70,6 +73,9 @@ function get_progression_harmoniousness(labeling) {
       var min_re = new RegExp(min_pattern);
 
       if (min_re.test(label)) {
+        if (label === min_pattern.replace("7", "")) {
+          min_points += 1;
+        }
         min_points += MIN_POINTS[MIN_KEYS[i]];
         break;
       }
@@ -161,59 +167,11 @@ function find_modulation_candidates(progression) {
 
 
 module.exports = {
-  determine_function: function(chord, root) {
-    var chord_root = chord.simple()[0];
-    var teoria = window.teoria;
-
-
-    // this is one way, but probably not the right way. instead, get the scale
-    // off the root in major and minor modes.
-    var interval = teoria.Interval.between(teoria.note(chord_root), teoria.note(root));
-
-    var progression_type = major_progression;
-    var prog_name = progression_type[interval.number() - 1];
-    var desired_quality = prog_name.toUpperCase() === prog_name;
-    if (desired_quality) {
-      desired_quality = "M";
-    } else {
-      desired_quality = "m";
-    }
-
-
-    // Look up for names to their symbols...
-    var lookup = {
-      "major" : "M",
-      "dominant" : "M7",
-      "minor" : "m"
-    };
-
-
-    var small_quality = lookup[chord.quality()];
-    var labeling = prog_name;
-    if (small_quality !== desired_quality) {
-      prog_name += small_quality;
-    }
-
-    if (interval.quality() == "m") {
-      prog_name = "b" + prog_name;
-    }
-    if (interval.quality() == "A") {
-      prog_name = "#" + prog_name;
-    }
-    if (interval.quality() == "d") {
-      prog_name = "bb" + prog_name;
-    }
-
-    return prog_name;
-
-
-
-  },
   label_progression: function(chord_list, root) {
     var labeled_chords = [];
     var teoria = window.teoria;
     _.each(chord_list, function(chord) {
-      var func_name = module.exports.determine_function(chord, root);
+      var func_name = Progression.determine_function(chord, root);
       labeled_chords.push(func_name);
     });
 
@@ -276,5 +234,8 @@ module.exports = {
     return modulations;
 
   },
-  decide_progression_likeliness: decide_progression_likeliness
-}
+  decide_progression_likeliness: decide_progression_likeliness,
+  get_progression_harmoniousness: get_progression_harmoniousness,
+  check_progression_grammar: check_progression_grammar
+};
+

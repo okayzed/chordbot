@@ -1,4 +1,4 @@
-
+var Progression = require("app/client/progression");
 // grammar is from chord grammar and info on
 // http://www.dangutwein.net/courses/mus201/handouts/har_mot.htm
 var MAJOR_GRAMMAR = "iii | vi | ii IV | V vii | I";
@@ -33,6 +33,7 @@ function build_chords_in_keys() {
 
 function update_grammar_matrix(grammar, grammar_matrix) {
   var tokens = grammar.split("|");
+  tokens.reverse();
 
   _.each(tokens, function(token, index) {
     var functions = token.split(" ");
@@ -57,10 +58,34 @@ function check_grammar(prev_chord, chord, matrix) {
   return 0;
 }
 
-function get_progression_candidates(chord, key) {
-  var candidates = [];
-  func = analysis.determine_function(chord, key);
+function add_grammar_to_candidates(candidates, func, grammar_matrix) {
+  if (grammar_matrix[func]) {
+    var index = grammar_matrix[func];
+    for (var i = Math.max(index-3, 0); i < index-1; i++) {
+      _.each(grammar_matrix[i], function(candidate) {
+        candidates[candidate] = true;
+      });
+    }
+  }
 
+}
+
+function get_progression_candidates(chord, key) {
+  var candidates = {};
+  var func = Progression.determine_function(chord, key);
+
+  func = func.replace("m", "").replace("M", "");
+
+  add_grammar_to_candidates(candidates, func, MAJOR_GRAMMAR_MATRIX);
+  add_grammar_to_candidates(candidates, func, MINOR_GRAMMAR_MATRIX);
+
+  if (func == "I") {
+
+  } else if (func == "Im") {
+
+  }
+
+  return _.keys(candidates);
 }
 
 function check_progression_grammar(labeling) {

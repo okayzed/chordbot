@@ -20,6 +20,7 @@ var read_progressions = [
 ];
 
 var analysis = require("app/client/analysis");
+var Progression = require("app/client/progression");
 var normal = require("app/client/normal");
 
 
@@ -65,7 +66,7 @@ module.exports = {
         progression.mod_labeling = _.clone(progression.labeling);
         progression.applied_modulations = {};
         _.each(modulations, function(new_key, i) {
-          var new_func = analysis.determine_function(chord_list[i], new_key);
+          var new_func = Progression.determine_function(chord_list[i], new_key);
           progression.applied_modulations[i] = new_func;
           progression.mod_labeling[i] = new_func;
         });
@@ -81,6 +82,9 @@ module.exports = {
       });
 
       console.log(sorted_progressions);
+      _.each(sorted_progressions, function(prog) {
+        console.log("HARMONIOUSNESS", analysis.get_progression_harmoniousness(prog.mod_labeling), "BREAKS", analysis.check_progression_grammar(prog.mod_labeling));
+      });
 
 
     });
