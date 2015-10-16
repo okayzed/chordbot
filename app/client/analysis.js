@@ -1,3 +1,4 @@
+var grammar = require("app/client/grammar");
 
 var major_progression = [ "I", "ii", "iii", "IV", "V", "vi", "vii" ];
 var minor_progression = [ "Im", "ii", "iii", "iv", "V", "VI", "vii" ];
@@ -81,15 +82,18 @@ function get_progression_harmoniousness(labeling) {
   return cached_harmoniousness[labeling_key];
 }
 
+var cached_grammar_checks = {};
 function check_progression_grammar(labeling) {
+  var labeling_key = labeling.join(",");
+  if (!cached_grammar_checks[labeling_key]) {
+    cached_grammar_checks[labeling_key] = grammar.check_progression_grammar(labeling);
+  }
 
-  return 0;
-
+  return cached_grammar_checks[labeling_key];
 }
 
 function decide_progression_likeliness(progression) {
   return get_progression_harmoniousness(progression) - (2 * check_progression_grammar(progression));
-
 }
 
 function find_modulation_candidates(progression) {
@@ -102,7 +106,7 @@ function find_modulation_candidates(progression) {
   var chords = progression.chord_list;
   for (var i = 0; i < chords.length; i++) {
     for (var j = i + 4; j < chords.length; j++) {
-      if (j - i >= 8) {
+      if (j - i > 8) {
         break;
       }
 
@@ -113,8 +117,6 @@ function find_modulation_candidates(progression) {
 
       current[candidate_key] = decide_progression_likeliness(current_labeling);
       var sorted_labelings = module.exports.rank_labelings(labelings);
-      sorted_labelings.reverse();
-
       var max_labeling =  sorted_labelings[0];
 
       candidates[candidate_key] = decide_progression_likeliness(labelings[max_labeling]);
@@ -249,7 +251,7 @@ module.exports = {
   },
   rank_labelings: function(labelings) {
     var ranked_labelings = _.sortBy(_.keys(labelings), function(key) {
-      return decide_progression_likeliness(labelings[key]);
+      return -decide_progression_likeliness(labelings[key]);
     });
 
     return ranked_labelings;
@@ -264,7 +266,7 @@ module.exports = {
     var WITNESSES = 2;
     _.each(modulation_candidates, function(scores, index) {
       var keys = _.keys(scores);
-      var sorted_keys = _.sortBy(keys, function(k) { return scores[k]; });
+      var sorted_keys = _.sortBy(keys, function(k) { return -scores[k]; });
       if (scores[sorted_keys[0]] > WITNESSES) {
         modulations[index] = sorted_keys[0];
       }
