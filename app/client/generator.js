@@ -45,10 +45,10 @@ function get_common_chord_modulations(progression) {
         return Progression.get_chord_for_function(c, mod_key);
       });
 
-      console.log("FUNCS", current_key, mod_key, Progression.determine_function(mod_key, current_key));
-      console.log("CANDIDATE FUNCS", current_key, mod_key, chord_candidates, new_chord_candidates);
-      console.log("CANDIDATE CHORDS", current_key, mod_key, candidate_chords, mod_candidate_chords);
-
+//      console.log("FUNCS", current_key, mod_key, Progression.determine_function(mod_key, current_key));
+//      console.log("CANDIDATE FUNCS", current_key, mod_key, chord_candidates, new_chord_candidates);
+//      console.log("CANDIDATE CHORDS", current_key, mod_key, candidate_chords, mod_candidate_chords);
+//
       var intersected = _.intersection(mod_candidate_chords, candidate_chords);
       if (intersected.length && chord_candidates.length) {
         var intersected_with_names = [];

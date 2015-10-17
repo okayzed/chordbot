@@ -47,7 +47,6 @@ module.exports = {
 
         acc += delta;
 
-        console.log("ACC", acc, chord_name);
         var chord = teoria.chord(chord_name);
         var chord_quality = "M";
         if (chord.quality() == "minor") {
