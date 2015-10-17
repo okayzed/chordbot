@@ -47,26 +47,31 @@ function get_common_chord_modulations(progression) {
 
       var intersected = _.intersection(mod_candidate_chords, candidate_chords);
       if (intersected.length && chord_candidates.length) {
+        var intersected_with_names = [];
+        _.each(intersected, function(chord) {
+          if (analysis.get_chord_key(chord) == simple_mod_key) {
+            return;
+          }
+
+          intersected_with_names.push([chord, Progression.determine_function(chord,
+            analysis.get_chord_key(mod_key))]);
+
+        });
+
+        if (!intersected_with_names.length) {
+          return;
+        }
+
         if (!candidates[current_key]) {
           candidates[current_key] = {};
         }
-        if (!candidates[current_key][mod_key]) {
-          candidates[current_key][mod_key] = [];
+        if (!candidates[current_key][simple_mod_key]) {
+          candidates[current_key][simple_mod_key] = {};
         }
 
-        var intersected_with_names = [];
-        _.each(intersected, function(chord) {
-          intersected_with_names.push(chord);
-          intersected_with_names.push(Progression.determine_function(chord,
-            analysis.get_chord_key(mod_key)));
 
-        });
-
-    
-        candidates[current_key][mod_key].push({
-          using: chord_key, 
-          common: intersected_with_names
-        });
+        var blah = candidates[current_key][simple_mod_key][chord_key];
+        candidates[current_key][simple_mod_key][chord_key] = intersected_with_names;
       }
 
 
@@ -102,6 +107,16 @@ function get_relative_modulations(progression) {
       candidates[chord_key + chord_quality][chord_key + "m"] = "p. min";
       var relative = teoria.note(chord_key).interval("M6");
       candidates[chord_key + chord_quality][relative.name() + relative.accidental() + "m"] = "r. min";
+
+      if (chord.quality() == "dominant") {
+        var implied_key = analysis.get_chord_key(teoria.note(chord_key).interval("P4").name());
+        candidates[chord_key + chord_quality][implied_key + "M"] = "res 7";
+      } else {
+        var implied_key = analysis.get_chord_key(teoria.note(chord_key).interval("P4").name());
+        candidates[chord_key + chord_quality][chord_key + "M7"] = "dom7";
+        candidates[chord_key + chord_quality][implied_key + "M"] = "res7";
+
+      }
     } else { // not major
       candidates[chord_key + chord_quality][chord_key + "M"] = "p. maj";
       var relative = teoria.note(chord_key).interval("m3");
@@ -126,5 +141,11 @@ module.exports = {
       // HERE WE GO...
       console.log("COMMON CHORD MODULATIONS", common_chord_modulations);
 
+      return {
+        relative: relative_modulations,
+        common_chord: common_chord_modulations
+      };
+
+ 
     }
 };
