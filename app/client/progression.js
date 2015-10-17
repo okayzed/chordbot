@@ -32,6 +32,39 @@ module.exports = {
 
     });
 
+    // Need to release the accumulator...
+    if (!acc) {
+      return chord_name;
+    }
+
+    bootloader.js("app/client/analysis", function() {
+      var analysis = bootloader.require("app/client/analysis");
+      while (acc != 0) {
+        var delta = 1;
+        if (acc > 0) {
+          delta = -1;
+        }
+
+        acc += delta;
+
+        console.log("ACC", acc, chord_name);
+        var chord = teoria.chord(chord_name);
+        var chord_quality = "M";
+        if (chord.quality() == "minor") {
+          chord_quality = "m";
+        }
+
+        if (delta > 0) {
+          chord_name = analysis.get_chord_key(chord_name) + "b" + chord_quality;
+        } else {
+          chord_name = analysis.get_chord_key(chord_name) + "#" + chord_quality;
+        }
+
+      }
+
+
+    });
+
     return chord_name;
 
     

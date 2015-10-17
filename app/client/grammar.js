@@ -19,7 +19,7 @@ var FUNCTIONS_FOR_KEY = {};
 
 function build_chords_for_key(key) {
   var major_flavors = "MmmMMmm";
-  var minor_flavors = "mmMmMMm";
+  var minor_flavors = "mmMmmMm";
 
   var major_functions = "I ii iii IV V vi vii".split(" ");
   var minor_functions = "Im ii III iv v VI vii".split(" ");
@@ -114,7 +114,7 @@ function check_grammar(prev_chord, chord, matrix) {
 function add_grammar_to_candidates(candidates, func, grammar_matrix, grammar_classes) {
   if (grammar_matrix[func]) {
     var index = grammar_matrix[func];
-    for (var i = Math.max(index-2, 0); i < index; i++) {
+    for (var i = Math.max(index-2, 0); i <= index; i++) {
       _.each(grammar_classes[i], function(is_true, candidate) {
         candidates[candidate] = true;
       });

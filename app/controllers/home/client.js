@@ -16,9 +16,9 @@ require("app/static/vendor/teoria");
 
 var read_progressions = [ 
   "Em GM Em GM", 
-  "A D A D A D F G A Dm GM CM AM Dm G7 CM Dm E7",
-  "Ebm Gbm C#M",
-  "Ab Db Ab Db Fb Gb Ab"
+//  "A D A D A D F G A Dm GM CM AM Dm G7 CM Dm E7",
+//  "Ebm Gbm C#M",
+//  "Ab Db Ab Db Fb Gb Ab"
 ];
 
 var analysis = require("app/client/analysis");
@@ -78,8 +78,6 @@ module.exports = {
       _.each(modulations, function(chord_info, dest) {
         _.each(chord_info, function(relation, using) {
           var rowEl = $("<div class='clearfix row'/>");
-          console.log("CHORD INFO", chord_info);
-
           rowEl.append($("<div class='col-md-1' />").text(source + "->" + dest));
           rowEl.append($("<div class='col-md-2 col-xs-2' />").text("on chord: " + using));
           _.each(relation, function(rel) {
