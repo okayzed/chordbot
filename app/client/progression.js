@@ -2,6 +2,8 @@
 var major_progression = [ "I", "ii", "iii", "IV", "V", "vi", "vii" ];
 var minor_progression = [ "Im", "ii", "III", "iv", "V", "VI", "vii" ];
 
+var cached_determineds = {};
+
 module.exports = {
   get_chord_for_function: function(func, root) {
     var acc = -1;
@@ -71,7 +73,16 @@ module.exports = {
     
 
   },
-  determine_function: function(chord, root) {
+  determine_function: function(chord, root) {   
+    if (!cached_determineds[root]) {
+      cached_determineds[root] = {};
+
+    }
+    if (cached_determineds[root][chord]) {
+      return cached_determineds[root][chord];
+    }
+
+
     if (typeof(chord) === "string") {
       chord = window.teoria.chord(chord);
     }
@@ -121,6 +132,8 @@ module.exports = {
     if (interval.quality() == "d") {
       prog_name = "bb" + prog_name;
     }
+
+    cached_determineds[root][chord] = prog_name;
 
     return prog_name;
 

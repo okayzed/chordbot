@@ -137,8 +137,17 @@ function check_progression_grammar(labeling) {
   return cached_grammar_checks[labeling_key];
 }
 
-function decide_progression_likeliness(progression) {
-  return get_progression_harmoniousness(progression) - (2 * check_progression_grammar(progression));
+var likeliness_cache = {};
+
+function decide_progression_likeliness(labeling) {
+  var labeling_key = labeling.join(",");
+
+  if (!likeliness_cache[labeling_key]) {
+    likeliness_cache[labeling_key] = get_progression_harmoniousness(labeling) - 
+      (2 * check_progression_grammar(labeling));
+  }
+
+  return likeliness_cache[labeling_key];
 }
 
 function find_modulation_candidates(progression) {

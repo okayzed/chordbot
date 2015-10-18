@@ -29,12 +29,18 @@
     opacity: 1;
     border-width: 2px;
     border-color: gold !important;
-
   }
 
   .hist_key.relative {
     opacity: 1;
     border-width: 2px;
-    border-color: green !important;
+    background-color: #444;
+    color: #eee;
+
+  }
+
+  .hist_key.common {
+    opacity: 1;
+    border-width: 2px;
   }
 }

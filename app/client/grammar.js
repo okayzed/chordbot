@@ -131,8 +131,6 @@ function get_progression_candidates(chord, key) {
 
   add_grammar_to_candidates(candidates, func, MAJOR_GRAMMAR_MATRIX, MAJOR_GRAMMAR_CLASSES);
   add_grammar_to_candidates(candidates, func, MINOR_GRAMMAR_MATRIX, MINOR_GRAMMAR_CLASSES);
-  add_grammar_to_candidates(candidates, stripped_func, MAJOR_GRAMMAR_MATRIX, MAJOR_GRAMMAR_CLASSES);
-  add_grammar_to_candidates(candidates, stripped_func, MINOR_GRAMMAR_MATRIX, MINOR_GRAMMAR_CLASSES);
 
   if (func === "I") {
     _.each(MAJOR_GRAMMAR_MATRIX, function(val, key) {
@@ -149,10 +147,16 @@ function get_progression_candidates(chord, key) {
   return _.keys(candidates);
 }
 
+var cached_grammar_checks = {};
 function check_progression_grammar(labeling) {
   var prev_chord;
   var misses = 0;
   var breaks = 0;
+  var labeling_key = labeling.join(" ");
+
+  if (cached_grammar_checks[labeling_key]) {
+    return cached_grammar_checks[labeling_key];
+  }
 
   _.each(labeling, function(chord) {
     chord = chord.replace("M6", "").replace("7", "");
@@ -188,6 +192,8 @@ function check_progression_grammar(labeling) {
 
   });
 
+  cached_grammar_checks[labeling_key] = misses + breaks;
+
   return misses + breaks;
 
 }
@@ -201,4 +207,4 @@ module.exports = {
   KEYS_WITH_CHORD: KEYS_HAVE_CHORD,
   CHORDS_IN_KEY: CHORDS_IN_KEY,
   FUNCTIONS_FOR_KEY: FUNCTIONS_FOR_KEY
-}
+};

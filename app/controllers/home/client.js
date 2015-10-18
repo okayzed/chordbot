@@ -18,6 +18,7 @@ var read_progressions = [
 //  "Em GM Em GM",
   "A D A D A D F G A Dm GM CM AM Dm G7 CM Dm E7",
 //  "Ebm Gbm C#M",
+// "G Em G Em G Bm Am D G Em Bm G G D G Bm C D G C G Bm Am D G Em Bm Em G F D",
 //  "Ab Db Ab Db Fb Gb Ab"
 ];
 
@@ -102,6 +103,10 @@ module.exports = {
       var rowEl = $("<div class='clearfix' />");
       rowEl.addClass("hist_row");
       rowEl.addClass("key_" + get_chord_name(key));
+
+      if ($(".key_" + get_chord_name(key)).length) {
+        return;
+      }
     
       var progression = Progression.major;
       if (!analysis.chord_is_major(key)) {
@@ -196,17 +201,17 @@ module.exports = {
 
       chordEl.hover(function() {
         self.build_popover(chordEl, progression, index);
-        chordEl.popover('show');
+//        chordEl.popover('show');
 
-        $(".hist_row").removeClass("active relative current");
-        $(".hist_key").removeClass("active relative current");
+        $(".hist_row").removeClass("active relative current common");
+        $(".hist_key").removeClass("active relative current common");
 
         module.exports.highlight_cells(progression, index);
 
       }, function() {
-        chordEl.popover('hide');
-        $(".hist_row").removeClass("active relative current");
-        $(".hist_key").removeClass("active relative current");
+//        chordEl.popover('hide');
+        $(".hist_row").removeClass("active relative current common");
+        $(".hist_key").removeClass("active relative current common");
 
       });
 
@@ -252,12 +257,11 @@ module.exports = {
       _.each(available, function(relative) {
         console.log("MAKING ACTIVE", relative, relative[0]);
         var keyEl = $(".key_" + get_chord_name(relative[0]));
-        console.log("KEY EL", keyEl);
         keyEl.addClass("active");
 
         // Common chords between relative key and the current key...
         _.each(relative[2], function(chord) {
-          keyEl.find(".chord_" + get_chord_name(chord)).addClass("relative");
+          keyEl.find(".chord_" + get_chord_name(chord)).addClass("common");
         });
       });
     }
@@ -304,7 +308,7 @@ module.exports = {
     chordEl.popover({
       content: content.html(),
       html: true,
-      placement: "bottom"
+      placement: "top"
 
     });
 
@@ -318,7 +322,6 @@ module.exports = {
 
     // We instantiate a progression class that should do what...?
     var likely_progressions = analysis.guess_progression_labelings(chord_list);
-
     var progressions = [];
     _.each(likely_progressions, function(labeling, key) {
       var progression = {};
@@ -328,6 +331,17 @@ module.exports = {
 
 
       normal.normalize_chord_list(chord_list, labeling, key);
+      progressions.push(progression);
+    });
+
+    progressions  = _.sortBy(progressions, function(p) {
+      p.likeliness = analysis.decide_progression_likeliness(p.labeling.slice(0, 4));
+      return -p.likeliness;
+    });
+    progressions = progressions.slice(0, 5);
+
+    _.each(progressions, function(progression) {
+
       var modulations = analysis.get_possible_modulations(progression);
       progression.modulations = modulations;
 
@@ -339,7 +353,6 @@ module.exports = {
         progression.mod_labeling[i] = new_func;
       });
 
-      progressions.push(progression);
 
     });
 
@@ -347,8 +360,12 @@ module.exports = {
       console.log("KEY", p.key, "HARMONIOUSNESS", analysis.get_progression_harmoniousness(p.mod_labeling), "BREAKS", analysis.check_progression_grammar(p.mod_labeling));
       p.likeliness = analysis.decide_progression_likeliness(p.labeling);
       p.mod_likeliness = analysis.decide_progression_likeliness(p.mod_labeling);
-      return -p.mod_likeliness;
+
+      var front_likely = analysis.decide_progression_likeliness(p.labeling.slice(0, 4));
+      return -front_likely;
     });
+
+    console.log(progressions);
 
     var prog = sorted_progressions[0];
     console.log("HARMONIOUSNESS", analysis.get_progression_harmoniousness(prog.mod_labeling), "BREAKS", analysis.check_progression_grammar(prog.mod_labeling));
