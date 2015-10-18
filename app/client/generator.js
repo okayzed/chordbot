@@ -27,15 +27,10 @@ function get_chord_names(intersected, mod_key) {
 
 function get_intersection(chord_key, current_key, mod_key) {
 
-  var chords_in_key = _.uniq(grammar.CHORDS_IN_KEY[chord_key]);
-
   var chord_candidates = grammar.get_progression_candidates(chord_key, current_key);
-  var chords_in_mod_key = grammar.CHORDS_IN_KEY[mod_key];
-  var in_common = _.intersection(chords_in_mod_key, chords_in_key);
 
   var simple_mod_key = analysis.get_chord_key(mod_key);
   var new_chord_candidates  = grammar.get_progression_candidates(chord_key, simple_mod_key);
-  var new_func = Progression.determine_function(chord_key, simple_mod_key);
 
   var candidate_chords = _.map(chord_candidates, function(c) {
     return Progression.get_chord_for_function(c, current_key);
@@ -62,7 +57,7 @@ function get_intersection(chord_key, current_key, mod_key) {
 var checked_keys = {};
 function get_common_chord_modulations(progression) {
   var candidates = {};
-  var relative_modulations = get_relative_modulations(progression);
+  var relative_modulations = progression.variations.relative;
   _.each(progression.chord_list, function(chord, index) {
     var current_key = progression.key;
     var current_func = progression.labeling[index];
@@ -158,8 +153,10 @@ function get_relative_modulations(progression) {
 
 module.exports = {
     get_possible_variations: function(progression) {
-      var common_chord_modulations = get_common_chord_modulations(progression);
       var relative_modulations = get_relative_modulations(progression);
+      progression.variations = { relative:  relative_modulations };
+
+      var common_chord_modulations = get_common_chord_modulations(progression);
 
       console.log("RELATIVE MODULATIONS", relative_modulations);
 

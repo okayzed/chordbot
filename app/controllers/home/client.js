@@ -16,11 +16,12 @@
 require("app/static/vendor/teoria");
 
 var read_progressions = [
+//  "F#M EM F#7 A"
 //  "Em GM Em GM",
-  "A D A D A D F G A",
-  "Dm GM CM AM Dm G7 CM Dm E7",
+//  "A D A D A D F G A",
+//  "Dm GM CM AM Dm G7 CM Dm E7",
 //  "Ebm Gbm C#M",
-// "G Em G Em G Bm Am D G Em Bm G G D G Bm C D G C G Bm Am D G Em Bm Em G F D",
+ "G Em G Em G Bm Am D G Em Bm G G D G Bm C D G C G Bm Am D G Em Bm Em G F D",
 //  "Ab Db Ab Db Fb Gb Ab"
 ];
 
