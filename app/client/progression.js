@@ -1,5 +1,7 @@
 
 var major_progression = [ "I", "ii", "iii", "IV", "V", "vi", "vii" ];
+var minor_progression = [ "Im", "ii", "III", "iv", "V", "VI", "vii" ];
+
 module.exports = {
   get_chord_for_function: function(func, root) {
     var acc = -1;
@@ -79,7 +81,12 @@ module.exports = {
 
     // this is one way, but probably not the right way. instead, get the scale
     // off the root in major and minor modes.
-    var interval = teoria.Interval.between(teoria.note(chord_root), teoria.note(root));
+    var interval = teoria.Interval.between(teoria.note(root), teoria.note(chord_root));
+
+    var value = interval.value();
+    if (value < 0) {
+      interval = interval.invert();
+    }
 
     var progression_type = major_progression;
     var prog_name = progression_type[(interval.number() - 1) % 7];
@@ -119,5 +126,7 @@ module.exports = {
 
 
 
-  }
+  },
+  minor: minor_progression,
+  major: major_progression
 };

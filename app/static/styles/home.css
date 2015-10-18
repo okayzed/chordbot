@@ -1,5 +1,40 @@
 .chord {
-  margin: 10px;
-  border-left: 2px dashed #ddd;
-  border-right: 2px dashed #ddd;
+  border-bottom: 2px dashed #ddd;
+  padding-bottom: 0px;
+  margin-bottom: 10px;
+}
+
+.histogram {
+  .hist_key {
+    opacity: 0.7;
+  }
+
+  .hist_key.current {
+    background-color: #aaa; 
+  }
+
+  .hist_row.current {
+    opacity: 1; 
+  }
+  
+  .hist_row {
+    display: none;
+  }
+
+  .hist_row.active {
+    display: block;
+  }
+
+  .hist_key.active {
+    opacity: 1;
+    border-width: 2px;
+    border-color: gold !important;
+
+  }
+
+  .hist_key.relative {
+    opacity: 1;
+    border-width: 2px;
+    border-color: green !important;
+  }
 }

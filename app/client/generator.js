@@ -66,16 +66,15 @@ function get_common_chord_modulations(progression) {
           return;
         }
 
-        if (!candidates[current_key]) {
-          candidates[current_key] = {};
+        if (!candidates[current_key + "M"]) {
+          candidates[current_key + "M"] = {};
         }
-        if (!candidates[current_key][simple_mod_key]) {
-          candidates[current_key][simple_mod_key] = {};
+        if (!candidates[current_key + "M"][mod_key]) {
+          candidates[current_key + "M"][mod_key] = {};
         }
 
 
-        var blah = candidates[current_key][simple_mod_key][chord_key];
-        candidates[current_key][simple_mod_key][chord_key] = intersected_with_names;
+        candidates[current_key + "M"][mod_key][chord_key] = intersected_with_names;
       }
 
 
@@ -133,12 +132,8 @@ function get_relative_modulations(progression) {
 
 module.exports = {
     get_possible_variations: function(progression) {
-      var histograms = analysis.get_chord_histograms(progression);
       var common_chord_modulations = get_common_chord_modulations(progression);
       var relative_modulations = get_relative_modulations(progression);
-
-      console.log("WEIGHTED HISTOGRAM", histograms.weighted);
-      console.log("UNWEIGHTED ", histograms.unweighted);
 
       console.log("RELATIVE MODULATIONS", relative_modulations);
 
