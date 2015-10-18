@@ -25,38 +25,29 @@ function get_chord_names(intersected, mod_key) {
   }
 }
 
+var cached_intersections = {};
 function get_intersection(chord_key, current_key, mod_key) {
+  var cache_key = chord_key + ":" + current_key + ":" + mod_key;
+  if (cached_intersections[cache_key]) {
+    return cached_intersections[cache_key];
+  }
 
-  var chord_candidates = grammar.get_progression_candidates(chord_key, current_key);
 
-  var simple_mod_key = analysis.get_chord_key(mod_key);
-  var new_chord_candidates  = grammar.get_progression_candidates(chord_key, simple_mod_key);
+  var candidate_chords = analysis.get_progression_candidate_chords(chord_key, current_key);
+  var mod_candidate_chords  = analysis.get_progression_candidate_chords(chord_key, mod_key);
 
-  var candidate_chords = _.map(chord_candidates, function(c) {
-    return Progression.get_chord_for_function(c, current_key);
-
-  });
-//      console.log("CANDIDATE CHORDS", current_key, chord_candidates, candidate_chords);
-//      console.log("MOD CANDIDATE CHORDS", mod_key, new_chord_candidates, mod_candidate_chords);
-//      console.log("FUNCS", current_key, mod_key, Progression.determine_function(mod_key, current_key));
-//      console.log("CANDIDATE FUNCS", current_key, mod_key, chord_candidates, new_chord_candidates);
-//      console.log("CANDIDATE CHORDS", current_key, mod_key, candidate_chords, mod_candidate_chords);
-//
-//      console.log("INTERSECTED", intersected);
-//
-//
-
-  var mod_candidate_chords = _.map(new_chord_candidates, function(c) {
-    return Progression.get_chord_for_function(c, mod_key);
-  });
   var intersected = _.intersection(mod_candidate_chords, candidate_chords);
 
+  cached_intersections[cache_key] = intersected;
   return intersected;
 
 }
-var checked_keys = {};
+
 function get_common_chord_modulations(progression) {
   var candidates = {};
+  var checked_keys = progression.checked_keys || {};
+  progression.checked_keys = {};
+
   var relative_modulations = progression.variations.relative;
   _.each(progression.chord_list, function(chord, index) {
     var current_key = progression.key;
@@ -87,10 +78,7 @@ function get_common_chord_modulations(progression) {
         var chord_key = analysis.get_flavored_key(relative);
         var keys_with_chords = grammar.KEYS_WITH_CHORD[chord_key];
         _.each(keys_with_chords, function(index, mod_key) {
-          if (analysis.get_chord_key(mod_key) === analysis.get_chord_key(current_key)) {
-            return;
-          }
-          var intersected = get_intersection(chord_key, analysis.get_chord_key(chord_key), mod_key);
+          var intersected = get_intersection(chord_key, analysis.get_chord_key(current_key), mod_key);
           var intersected_with_names = get_chord_names(intersected, mod_key);
 
           if (!candidates[current_key + "M"]) { candidates[current_key + "M"] = {}; }
@@ -152,6 +140,7 @@ function get_relative_modulations(progression) {
 }
 
 module.exports = {
+    get_intersection: get_intersection,
     get_possible_variations: function(progression) {
       var relative_modulations = get_relative_modulations(progression);
       progression.variations = { relative:  relative_modulations };

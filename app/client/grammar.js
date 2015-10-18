@@ -120,7 +120,7 @@ function check_grammar(prev_chord, chord, matrix) {
 function add_grammar_to_candidates(candidates, func, grammar_matrix, grammar_classes) {
   if (grammar_matrix[func]) {
     var index = grammar_matrix[func];
-    for (var i = Math.max(index-2, 0); i <= index; i++) {
+    for (var i = Math.max(index-2, 0); i < index; i++) {
       _.each(grammar_classes[i], function(is_true, candidate) {
         candidates[candidate] = true;
       });
@@ -166,7 +166,9 @@ function check_progression_grammar(labeling) {
     return cached_grammar_checks[labeling_key];
   }
 
-  _.each(labeling, function(chord) {
+  var issues = {};
+
+  _.each(labeling, function(chord, index) {
     chord = chord.replace("M6", "").replace("7", "");
     if (prev_chord) {
       var prev_in_major_grammar = _.contains(_.keys(MAJOR_GRAMMAR_MATRIX), prev_chord);
@@ -180,16 +182,21 @@ function check_progression_grammar(labeling) {
       }
 
       if (!in_major_grammar && !in_minor_grammar) {
-        misses++;
+        issues[index] = 'miss';
         return;
       }
 
       if (prev_in_minor_grammar && in_minor_grammar) {
-        breaks += check_grammar(prev_chord, chord, MINOR_GRAMMAR_MATRIX);
+        if (check_grammar(prev_chord, chord, MINOR_GRAMMAR_MATRIX)) {
+          issues[index] = 'break';
+
+        }
       }
 
       if (prev_in_major_grammar && in_major_grammar) {
-        breaks += check_grammar(prev_chord, chord, MAJOR_GRAMMAR_MATRIX);
+        if (check_grammar(prev_chord, chord, MAJOR_GRAMMAR_MATRIX)) {
+          issues[index] = 'break';
+        }
       }
 
     }
@@ -202,7 +209,7 @@ function check_progression_grammar(labeling) {
 
   cached_grammar_checks[labeling_key] = misses + breaks;
 
-  return misses + breaks;
+  return issues;
 
 }
 

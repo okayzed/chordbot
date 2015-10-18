@@ -134,7 +134,18 @@ function check_progression_grammar(labeling) {
     cached_grammar_checks[labeling_key] = grammar.check_progression_grammar(labeling);
   }
 
+  return _.keys(cached_grammar_checks[labeling_key]);
+}
+
+function get_progression_breaks(labeling) {
+  var labeling_key = labeling.join(",");
+  if (!cached_grammar_checks[labeling_key]) {
+    cached_grammar_checks[labeling_key] = grammar.check_progression_grammar(labeling);
+  }
+
+  console.log("BREAKS ARE", cached_grammar_checks[labeling_key]);
   return cached_grammar_checks[labeling_key];
+
 }
 
 var likeliness_cache = {};
@@ -211,6 +222,14 @@ function find_modulation_candidates(progression) {
   return modulation_candidates;
 
 }
+
+function get_progression_candidate_chords(chord, key) {
+  var candidates = grammar.get_progression_candidates(chord, module.exports.get_chord_key(key));
+  return _.map(candidates, function(candidate) {
+    return Progression.get_chord_for_function(candidate, module.exports.get_flavored_key(key));
+  });
+}
+
 
 
 
@@ -339,6 +358,8 @@ module.exports = {
 
     };
 
-  }
+  },
+  get_progression_breaks: get_progression_breaks,
+  get_progression_candidate_chords: get_progression_candidate_chords
 };
 

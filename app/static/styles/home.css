@@ -1,12 +1,65 @@
+.container textarea {
+  width: 100%;
+  font-size: 32px;
+  padding: 10px;
+  padding-top: 20px;
+}
+
+.function_label,
+.mod_label {
+  width: 25%;
+  float: left;
+  font-family: serif;
+}
+
 .chord {
   border-bottom: 2px dashed #ddd;
   padding-bottom: 0px;
   margin-bottom: 10px;
+  cursor: pointer;
+  font-size: 200%;
+  padding: 10px;
+
+  .function_label,
+  .mod_label {
+    font-size: 50%;
+  }
+
+  &.hover {
+    background-color: #ddd;
+  }
+
+  &.miss {
+    border-bottom: 2px solid #faf; 
+
+  }
+
+  &.break {
+    border-bottom: 2px solid #faa; 
+  }
 }
 
 .histogram {
+  position: fixed;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
+  padding-left: 50px;
+  padding-right: 50px;
+  padding-top: 50px;
+  padding-bottom: 20px;
+
+  background-color: rgba(0, 0, 0, 0.8);
+  color: #eee;
+
+
   .hist_key {
     opacity: 0.7;
+    width: 12%;
+    cursor: pointer;
+    margin-right: 1%;
+    padding-left: 1%;
+    float: left;
   }
 
   .hist_row {
@@ -25,7 +78,6 @@
 
   .hist_key.implied {
     font-weight: bold;
-    color: #666;
     border-bottom: 2px dotted gray;
   }
 
@@ -42,15 +94,31 @@
   .hist_key.common {
     opacity: 1;
     border-width: 2px;
-    background-color: #afa;
+    border-left: 5px solid #3ff;
+/*     background-color: #aff; */
+/*     color: #000; */
+  }
+  .hist_key.possible {
+    opacity: 1;
+    border-width: 2px;
+/*     background-color: #afa; */
+/*     color: #000; */
+    border-left: 5px solid #3f6;
   }
 
   .hist_key.current {
     background-color: #aaa; 
   }
 
+  .hist_row {
+    border-top: 2px solid #aaa;
+    margin-bottom: 10px;
+  }
+
   .hist_row.current {
     opacity: 1; 
+    border-top: 2px solid #3f6;
+    margin-bottom: 10px;
   }
   
 /*  */

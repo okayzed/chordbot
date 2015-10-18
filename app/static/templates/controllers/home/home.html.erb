@@ -1,8 +1,29 @@
 <% add_stylesheet("home") %>
 
+<% 
+
+  var examples = [
+    "AM D AM D F G Am",
+    "Gm E Gm E",
+    "Dm GM CM AM Dm G7 CM Dm E7",
+    "Ab Db Ab Db Fb Gb Ab",
+    "G Em G Em G Bm Am D G Em Bm G G D G Bm C D G C G Bm Am D G Em Bm Em G F D"
+  ];
+%>
+
 <div class="container" style="margin: auto; margin-top: 10px; padding-bottom: 200px">
+
+  <form class='form' style='margin-top: 200px'>
+    <textarea class='form-control' style='width: 100%'><%= examples[_.random(examples.length-1)] %></textarea>
+  </form>
+
+  <div class='mtl btn btn-info analyze form-control'>feed chord bot</div>
+
+  <div class="loading" style="display: none; text-align: center; padding-top: 20px;" > 
+    <img style="margin: auto;" src="/images/loading.gif"> </img> 
+  </div>
+
   <div class='progression'> </div>
-  <hr />
-  <div class='histogram'> </div>
+  <div class='histogram mtl'> </div>
 </div>
 
