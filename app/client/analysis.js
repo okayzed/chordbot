@@ -61,14 +61,14 @@ var MAJ_POINTS = {
     "vii": 1,
     "vi": 1,
     "V" : 1,
-    "I" : 3,
+    "I" : 2,
     "sus" : -1,
     "b" : -1
 };
 
 var MIN_POINTS = {
     "vii" : 1,
-    "Im" : 3,
+    "Im" : 2,
     "ii": 1,
     "III": 1,
     "iv" : 1,

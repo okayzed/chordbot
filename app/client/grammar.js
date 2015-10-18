@@ -2,7 +2,7 @@ var Progression = require("app/client/progression");
 // grammar is from chord grammar and info on
 // http://www.dangutwein.net/courses/mus201/handouts/har_mot.htm
 var MAJOR_GRAMMAR = "iii | vi | ii IV | V vii | I";
-var MINOR_GRAMMAR = "III | VI vi | ii iv IV | v V vii | Im";
+var MINOR_GRAMMAR = "III | VI vi | ii IV iv | v V vii | I";
 var MAJOR_GRAMMAR_MATRIX = {};
 var MINOR_GRAMMAR_MATRIX = {};
 var MAJOR_GRAMMAR_CLASSES = {};
@@ -31,6 +31,24 @@ function build_chords_for_key(key) {
   var minor_chords = [];
 
   FUNCTIONS_FOR_KEY[key] = {};
+  FUNCTIONS_FOR_KEY[minor_key] = {};
+  FUNCTIONS_FOR_KEY[major_key] = {};
+
+
+  var minor_scale = teoria.note(key).scale('minor').simple();
+  _.each(minor_scale, function(note, index) {
+    var flavored_note = note + minor_flavors[index];
+    minor_chords.push(flavored_note);
+
+    if (!KEYS_HAVE_CHORD[flavored_note]) {
+      KEYS_HAVE_CHORD[flavored_note] = {};
+    }
+
+    KEYS_HAVE_CHORD[flavored_note][minor_key] = index + 1;
+
+    FUNCTIONS_FOR_KEY[minor_key][minor_functions[index]] = flavored_note;
+    FUNCTIONS_FOR_KEY[key][major_functions[index]] = flavored_note;
+  });
 
   var major_scale = teoria.note(key).scale('major').simple();
   _.each(major_scale, function(note, index) {
@@ -43,20 +61,8 @@ function build_chords_for_key(key) {
 
     KEYS_HAVE_CHORD[flavored_note][major_key] = index + 1;
 
+    FUNCTIONS_FOR_KEY[major_key][major_functions[index]] = flavored_note;
     FUNCTIONS_FOR_KEY[key][major_functions[index]] = flavored_note;
-  });
-
-  var minor_scale = teoria.note(key).scale('minor').simple();
-  _.each(minor_scale, function(note, index) {
-    var flavored_note = note + minor_flavors[index];
-    minor_chords.push(flavored_note);
-
-    if (!KEYS_HAVE_CHORD[flavored_note]) {
-      KEYS_HAVE_CHORD[flavored_note] = {};
-    }
-
-    KEYS_HAVE_CHORD[flavored_note][minor_key] = index + 1;
-    FUNCTIONS_FOR_KEY[key][minor_functions[index]] = flavored_note;
   });
 
   CHORDS_IN_KEY[major_key] = major_chords;
@@ -131,6 +137,8 @@ function get_progression_candidates(chord, key) {
 
   add_grammar_to_candidates(candidates, func, MAJOR_GRAMMAR_MATRIX, MAJOR_GRAMMAR_CLASSES);
   add_grammar_to_candidates(candidates, func, MINOR_GRAMMAR_MATRIX, MINOR_GRAMMAR_CLASSES);
+  add_grammar_to_candidates(candidates, stripped_func, MAJOR_GRAMMAR_MATRIX, MAJOR_GRAMMAR_CLASSES);
+  add_grammar_to_candidates(candidates, stripped_func, MINOR_GRAMMAR_MATRIX, MINOR_GRAMMAR_CLASSES);
 
   if (func === "I") {
     _.each(MAJOR_GRAMMAR_MATRIX, function(val, key) {

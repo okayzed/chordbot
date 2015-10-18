@@ -12,11 +12,13 @@
 // progressions.determine - need to implement
 'use strict';
 
+
 require("app/static/vendor/teoria");
 
 var read_progressions = [
 //  "Em GM Em GM",
-  "A D A D A D F G A Dm GM CM AM Dm G7 CM Dm E7",
+  "A D A D A D F G A",
+  "Dm GM CM AM Dm G7 CM Dm E7",
 //  "Ebm Gbm C#M",
 // "G Em G Em G Bm Am D G Em Bm G G D G Bm C D G C G Bm Am D G Em Bm Em G F D",
 //  "Ab Db Ab Db Fb Gb Ab"
@@ -107,7 +109,7 @@ module.exports = {
       if ($(".key_" + get_chord_name(key)).length) {
         return;
       }
-    
+
       var progression = Progression.major;
       if (!analysis.chord_is_major(key)) {
         progression = Progression.minor;
@@ -117,6 +119,7 @@ module.exports = {
       if (printed_keys[get_chord_name(key)]) {
         return;
       }
+
 
       printed_keys[get_chord_name(key)] = true;
 
@@ -134,15 +137,14 @@ module.exports = {
           if (seen) { seen_key = true; }
           if (implied) { implied_key = true; }
         }
-        
-        if (implied) {
-          el.css("border-bottom", "2px dotted gray");
 
+        if (implied) {
+          el.addClass("implied");
         }
 
         if (seen) {
-          el.css("border", "2px solid gray");
-        } 
+          el.addClass("seen");
+        }
 
         el.html(get_chord_name(chord));
 
@@ -199,19 +201,20 @@ module.exports = {
         chordEl.append("<div>&nbsp;</div>");
       }
 
+      function wipe_els(els) {
+        els.removeClass("active relative current common");
+      }
+
       chordEl.hover(function() {
         self.build_popover(chordEl, progression, index);
 //        chordEl.popover('show');
 
-        $(".hist_row").removeClass("active relative current common");
-        $(".hist_key").removeClass("active relative current common");
-
+        wipe_els($(".hist_row, .hist_key"));
         module.exports.highlight_cells(progression, index);
 
       }, function() {
 //        chordEl.popover('hide');
-        $(".hist_row").removeClass("active relative current common");
-        $(".hist_key").removeClass("active relative current common");
+        wipe_els($(".hist_row, .hist_key"));
 
       });
 
@@ -233,6 +236,8 @@ module.exports = {
     // and we find the modulations based on current key / destination key
     var relatives = relative_modulations[analysis.get_flavored_key(chord)];
     var available = [
+      [progression.key, "", []],
+      [progression.modulations[index] || progression.key, "", []],
       [chord, "", []]
     ];
     _.each(common_chord_modulations[current_key + "M"], function(chords, dest_key) {
@@ -243,7 +248,8 @@ module.exports = {
     });
 
     _.each(relatives, function(reason, relative) {
-      $(".chord_" + get_chord_name(relative)).addClass("relative");
+      var chordEl = $(".chord_" + get_chord_name(relative));
+      chordEl.addClass("relative");
     });
 
     $(".chord_" + get_chord_name(chord)).addClass("current");
@@ -255,13 +261,12 @@ module.exports = {
 
     if (available.length) {
       _.each(available, function(relative) {
-        console.log("MAKING ACTIVE", relative, relative[0]);
         var keyEl = $(".key_" + get_chord_name(relative[0]));
         keyEl.addClass("active");
 
         // Common chords between relative key and the current key...
         _.each(relative[2], function(chord) {
-          keyEl.find(".chord_" + get_chord_name(chord)).addClass("common");
+          $(".chord_" + get_chord_name(chord[0])).addClass("common");
         });
       });
     }
@@ -301,14 +306,14 @@ module.exports = {
       content.append("<h3>Common Chord Modulations</h3>");
 
       _.each(available, function(relative) {
-        content.append( relative[0].toUpperCase() + "\t" + relative[2] + "<br />\n");
+        content.append( get_chord_name(relative[0]) + "\t" + relative[2] + "<br />\n");
       });
     }
 
     chordEl.popover({
       content: content.html(),
       html: true,
-      placement: "top"
+      placement: "auto",
 
     });
 

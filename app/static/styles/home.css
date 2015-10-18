@@ -9,14 +9,6 @@
     opacity: 0.7;
   }
 
-  .hist_key.current {
-    background-color: #aaa; 
-  }
-
-  .hist_row.current {
-    opacity: 1; 
-  }
-  
   .hist_row {
     display: none;
   }
@@ -31,16 +23,53 @@
     border-color: gold !important;
   }
 
-  .hist_key.relative {
-    opacity: 1;
-    border-width: 2px;
-    background-color: #444;
-    color: #eee;
+  .hist_key.implied {
+    font-weight: bold;
+    color: #666;
+    border-bottom: 2px dotted gray;
+  }
 
+  .hist_key.seen {
+    font-weight: bold;
+    border-bottom: 2px solid gray;
+  }
+
+
+  .hist_key.relative {
+    border-width: 2px;
   }
 
   .hist_key.common {
     opacity: 1;
     border-width: 2px;
+    background-color: #afa;
   }
+
+  .hist_key.current {
+    background-color: #aaa; 
+  }
+
+  .hist_row.current {
+    opacity: 1; 
+  }
+  
+/*  */
+/*  */
+/*   .rmin, */
+/*   .pmin { */
+/*     background-color: blue; */
+/*   } */
+/*    */
+/*   .pmaj, */
+/*   .rmaj { */
+/*     background-color: green; */
+/*   } */
+/*  */
+/*   .dom7 { */
+/*  */
+/*   } */
+/*  */
+/*   .res7 { */
+/*     background-color: yellow; */
+/*   } */
 }
