@@ -31,6 +31,7 @@ var normal = require("app/client/normal");
 var generator = require("app/client/generator");
 
 var BARS_PER_LINE = 8;
+var LAST_SELECTED_INDEX;
 
 function get_chord_classname(chord) {
   return get_chord_name(chord).replace("#", "s");
@@ -208,7 +209,7 @@ module.exports = {
       var current_key = progression.key;
       var mod_key = progression.modulations[index] || current_key;
       var chordLabel = $("<div class='function_label rfloat'/>");
-      chordLabel.html(progression.labeling[index] + "<br /> <span class=''>" + current_key.toUpperCase() + "</span>");
+      chordLabel.html(progression.labeling[index] + "<br /> <span class=''>" + get_chord_name(current_key) + "</span>");
 
       chordEl.text(progression.chord_list[index] + " (" + get_chord_name(progression.chord_list[index]) + ")");
       chordEl.append($("<div class='clearfix'/>"));
@@ -251,6 +252,7 @@ module.exports = {
   },
 
   highlight_cells: function(progression, index) {
+    LAST_SELECTED_INDEX = index;
     var current_key = progression.modulations[index] || progression.key;
     var chord = progression.chord_list[index];
     var relative_modulations = progression.variations.relative;
@@ -397,6 +399,9 @@ module.exports = {
 
       var histEl = module.exports.build_histogram_for_progression(prog);
       self.$el.find(".histogram").append(histEl);
+      
+      module.exports.highlight_cells(prog, LAST_SELECTED_INDEX || prog.chord_list.length - 1);
+      $($(".chord")[LAST_SELECTED_INDEX]).addClass("hover");
     }, 100);
 
 
