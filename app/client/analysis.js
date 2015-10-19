@@ -68,7 +68,7 @@ var MAJ_POINTS = {
 
 var MIN_POINTS = {
     "vii" : 1,
-    "Im" : 2,
+    "Im" : 1,
     "ii": 1,
     "III": 1,
     "iv" : 1,
@@ -134,7 +134,7 @@ function check_progression_grammar(labeling) {
     cached_grammar_checks[labeling_key] = grammar.check_progression_grammar(labeling);
   }
 
-  return _.keys(cached_grammar_checks[labeling_key]);
+  return _.keys(cached_grammar_checks[labeling_key]).length;
 }
 
 function get_progression_breaks(labeling) {
@@ -288,7 +288,7 @@ module.exports = {
     var modulation_candidates = find_modulation_candidates(progression);
     var delta = Date.now() - now;
     var modulations = {};
-    var WITNESSES = 2;
+    var WITNESSES = 3;
     _.each(modulation_candidates, function(scores, index) {
       var keys = _.keys(scores);
       var sorted_keys = _.sortBy(keys, function(k) { return -scores[k]; });

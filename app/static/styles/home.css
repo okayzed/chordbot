@@ -46,10 +46,9 @@
   right: 0px;
   padding-left: 50px;
   padding-right: 50px;
-  padding-top: 50px;
-  padding-bottom: 20px;
+  padding-top: 20px;
 
-  background-color: rgba(0, 0, 0, 0.8);
+  background-color: #333;
   color: #eee;
 
 
@@ -57,9 +56,23 @@
     opacity: 0.7;
     width: 12%;
     cursor: pointer;
-    margin-right: 1%;
+    padding-right: 1%;
     padding-left: 1%;
     float: left;
+
+  }
+
+  .hist_key_2 {
+    width: 24%;
+    padding-right: 1%;
+    padding-left: 1%;
+    float: left;
+  }
+
+  .hist_head {
+    background-color: #bbb;
+    color: #000;
+    text-align: center;
   }
 
   .hist_row {
@@ -111,15 +124,42 @@
   }
 
   .hist_row {
-    border-top: 2px solid #aaa;
+    .hist_key {
+      border-top: 2px solid #aaa;
+    }
     margin-bottom: 10px;
   }
 
   .hist_row.current {
     opacity: 1; 
-    border-top: 2px solid #3f6;
+    .hist_key {
+      border-top: 2px solid #3f6;
+    }
     margin-bottom: 10px;
   }
+
+
+.hist_key.class_1 {
+  background-color: #babdb6;
+}
+
+.hist_key_2.class_2,
+.hist_key.class_2 {
+  background-color: #fcaf3e;
+}
+.hist_key_2.class_3,
+.hist_key.class_3 {
+  background-color: #eeeeec;
+}
+
+.hist_key.class_4 {
+  background-color: #8ae234;
+  color: #000;
+}
+.hist_key.class_5 {
+  background-color: #729fcf;
+  color: #000;
+}
   
 /*  */
 /*  */

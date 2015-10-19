@@ -65,6 +65,7 @@ function get_chords_from_str(str) {
 }
 
 
+var OPENED = false;
 module.exports = {
   click_handler_uno: function() {
   },
@@ -77,9 +78,27 @@ module.exports = {
     console.log("WEIGHTED HISTOGRAM", histograms.weighted);
     console.log("UNWEIGHTED ", histograms.unweighted);
 
+
     var parentEl = $("<div />");
     var canseeEl = $("<div />");
     var overallEl = $("<div />");
+
+    // get the hist out of the way
+    var closehistEl = $("<div class='rfloat' style='20px; cursor: pointer;' />");
+    closehistEl.text("Close");
+    closehistEl.on('click', function() {
+      OPENED = false;
+      $(".hist_key, .hist_row").removeClass("active relative current common possible");
+    });
+    overallEl.append(closehistEl);
+    // the header for the progression is
+
+    parentEl.append("<div class='hist_head hist_key class_1'>&nbsp;</div>");
+    parentEl.append("<div class='hist_head hist_key hist_key_2 class_2'>&nbsp;</div>");
+    parentEl.append("<div class='hist_head hist_key hist_key_2 class_3'>&nbsp;</div>");
+    parentEl.append("<div class='hist_head hist_key class_4'>&nbsp;</div>");
+    parentEl.append("<div class='hist_head hist_key class_5'>&nbsp;</div>");
+    parentEl.append("<div class='col-md-12 col-xs-12 clearfix' >&nbsp;</div>");
 
     overallEl.append(parentEl).append(canseeEl);
 
@@ -216,13 +235,20 @@ module.exports = {
         els.removeClass("active relative current common possible");
       }
 
-      chordEl.hover(function() {
-        self.build_popover(chordEl, progression, index);
-        wipe_els($(".hist_row, .hist_key"));
-        module.exports.highlight_cells(progression, index);
-        $(".hover").removeClass("hover");
-        $(this).addClass("hover");
-      }, function() {
+      var open = false;
+      chordEl.click(function() {
+        if (open && OPENED == chord) {
+          wipe_els($(".hist_row, .hist_key"));
+          $(".hover").removeClass("hover");
+          open = false;
+        } else {
+          OPENED = chord;
+          open = true;
+          wipe_els($(".hist_row, .hist_key"));
+          module.exports.highlight_cells(progression, index);
+          $(".hover").removeClass("hover");
+          $(this).addClass("hover");
+        }
       });
 
 
@@ -290,53 +316,6 @@ module.exports = {
 
 
   },
-
-  build_popover: function(chordEl, progression, index) {
-    var has_popover = chordEl.data("has_popover");
-    if (has_popover) {
-      return;
-    }
-
-    var current_key = progression.key;
-    var chord = progression.chord_list[index];
-    var relative_modulations = progression.variations.relative;
-    var common_chord_modulations = progression.variations.common_chord;
-
-    // For any given chord, we find it's relative modulations...
-    // and we find the modulations based on current key / destination key
-    var relatives = relative_modulations[analysis.get_flavored_key(chord)];
-    var available = [];
-    _.each(common_chord_modulations[current_key + "M"], function(chords, dest_key) {
-      var chord_key = analysis.get_flavored_key(chord);
-      if (chords[chord_key]) {
-        available.push([dest_key, get_chord_name(chord_key), chords[chord_key]]);
-      }
-    });
-
-    var content = $("<div />");
-    content.append("<h3>Relative modulations</h3>");
-    _.each(relatives, function(reason, relative) {
-      content.append( get_chord_name(relative) + "\t <span class='rfloat'>" + reason + "</span><br />\n" );
-    });
-
-    if (available.length) {
-      content.append("<h3>Common Chord Modulations</h3>");
-
-      _.each(available, function(relative) {
-        content.append( get_chord_name(relative[0]) + "\t" + relative[2] + "<br />\n");
-      });
-    }
-
-    chordEl.popover({
-      content: content.html(),
-      html: true,
-      placement: "auto",
-
-    });
-
-  },
-
-
 
   analyze_progression_str: function(line) {
     line = line.trim();
@@ -414,10 +393,17 @@ module.exports = {
     this.$el.find(id).show();
   },
   analyze_chords: _.debounce(function() {
-    $(".loading").show();
     $("form").css("margin-top", "50px");
     var chord_str = this.$el.find("textarea").val();
     var chord_strs = chord_str.split("\n");
+    var val = chord_str.trim();
+    if (val === module.exports.old_val) {
+      return;
+    }
+
+    $(".loading").show();
+    module.exports.old_val = val;
+
     $(".progression, .histogram").empty();
   
     var self = this;

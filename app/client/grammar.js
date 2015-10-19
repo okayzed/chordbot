@@ -108,6 +108,7 @@ function update_grammar_matrix(grammar, grammar_matrix, grammar_classes) {
 function check_grammar(prev_chord, chord, matrix) {
   var prev_class = matrix[prev_chord];
   var new_class = matrix[chord];
+
   if (prev_class !== 0) {
     if (prev_class < new_class) {
       return 1;
@@ -201,10 +202,7 @@ function check_progression_grammar(labeling) {
 
     }
 
-      
-    
     prev_chord = chord;
-
   });
 
   cached_grammar_checks[labeling_key] = misses + breaks;
