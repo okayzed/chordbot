@@ -7,6 +7,7 @@
     "app/static/vendor/jquery.deserialize.js",
     "app/static/vendor/jquery-deparam.js",
     "app/static/vendor/fastclick.js",
+    "app/static/vendor/timbre.dev.js",
     "app/static/vendor/strtotime.js",
     "app/static/vendor/hex-rgb.src.js"
   ],

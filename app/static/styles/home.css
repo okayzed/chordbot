@@ -20,6 +20,12 @@
   font-size: 200%;
   padding: 10px;
 
+  -webkit-user-select: none;  /* Chrome all / Safari all */
+  -moz-user-select: none;     /* Firefox all */
+  -ms-user-select: none;      /* IE 10+ */
+  user-select: none;          /* Likely future */      
+
+
   .function_label,
   .mod_label {
     font-size: 50%;
@@ -37,6 +43,11 @@
   &.break {
     border-bottom: 2px solid #faa; 
   }
+
+  &.playing {
+    background-color: #aaf;
+  }
+
 }
 
 .histogram {
@@ -52,6 +63,8 @@
   color: #eee;
 
 
+
+
   .hist_key {
     opacity: 0.7;
     width: 12%;
@@ -59,6 +72,12 @@
     padding-right: 1%;
     padding-left: 1%;
     float: left;
+
+     -webkit-user-select: none;  /* Chrome all / Safari all */
+     -moz-user-select: none;     /* Firefox all */
+     -ms-user-select: none;      /* IE 10+ */
+     user-select: none;          /* Likely future */      
+
 
   }
 

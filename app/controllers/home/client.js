@@ -235,6 +235,9 @@ module.exports = {
           open = false;
         } else {
           OPENED = chord;
+          bootloader.require("app/client/synth", function(synth) {
+            synth.play_chord(analysis.get_flavored_key(progression.chord_list[index]));
+          });
           open = true;
           wipe_els($(".hist_row, .hist_key"));
           module.exports.highlight_cells(progression, index);
@@ -435,9 +438,43 @@ module.exports = {
       $(".loading").hide();
     }, 100);
   }, 500),
+  click_chord: function(e, el) {
+    var chord = $(e.target).html();
+    bootloader.require("app/client/synth", function(synth) {
+      synth.play_chord(chord);
+      
+    });
+  },
+  play_chords: function() {
+    var lines = $("textarea").val().replace(/\s\s/, " ").trim().split(" ");
+
+    var index = 0;
+    var playNextChord = function() {
+      if (index >= lines.length) {
+        return;
+      }
+
+      var duration = 1000;
+
+      bootloader.require("app/client/synth", function(synth) {
+        console.log("PLAYING CHORDS", lines[index]);
+        synth.play_chord(lines[index], duration);
+        $(".chord").removeClass("playing");
+        $($(".chord").get(index)).addClass("playing");
+        index += 1;
+        setTimeout(playNextChord, duration);
+        
+      });
+    };
+
+    playNextChord();
+
+  },
   events: {
     "keydown textarea" : "analyze_chords",
-    "click .analyze" : "analyze_chords"
+    "click .analyze" : "analyze_chords",
+    "click .play" : "play_chords",
+    "click .hist_key" : "click_chord"
   }
 
 
