@@ -134,7 +134,8 @@ function get_progression_candidates(chord, key) {
   var candidates = {};
   var func = Progression.determine_function(chord, key);
 
-  var stripped_func = func.replace("m", "").replace("M", "");
+  // We are pretending like b and # chords are substitutes for what they are on
+  var stripped_func = func.replace(/[mM]/, "").replace(/^[b#]/, "");
 
   add_grammar_to_candidates(candidates, func, MAJOR_GRAMMAR_MATRIX, MAJOR_GRAMMAR_CLASSES);
   add_grammar_to_candidates(candidates, func, MINOR_GRAMMAR_MATRIX, MINOR_GRAMMAR_CLASSES);

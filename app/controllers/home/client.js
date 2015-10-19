@@ -80,7 +80,6 @@ module.exports = {
 
 
     var parentEl = $("<div />");
-    var canseeEl = $("<div />");
     var overallEl = $("<div />");
 
     // get the hist out of the way
@@ -100,7 +99,7 @@ module.exports = {
     parentEl.append("<div class='hist_head hist_key class_5'>&nbsp;</div>");
     parentEl.append("<div class='col-md-12 col-xs-12 clearfix' >&nbsp;</div>");
 
-    overallEl.append(parentEl).append(canseeEl);
+    overallEl.append(parentEl);
 
     var printed_keys = {};
 
@@ -171,15 +170,7 @@ module.exports = {
       });
 
       rowEl.append(mapped);
-      if (seen_key) {
-        parentEl.append(rowEl);
-      } else if (implied_key) {
-        canseeEl.prepend(rowEl);
-      } else {
-        canseeEl.append(rowEl);
-
-      }
-
+      parentEl.append(rowEl);
     });
 
     return overallEl;
@@ -219,7 +210,7 @@ module.exports = {
       var chordLabel = $("<div class='function_label rfloat'/>");
       chordLabel.html(progression.labeling[index] + "<br /> <span class=''>" + current_key.toUpperCase() + "</span>");
 
-      chordEl.text(get_chord_name(chord));
+      chordEl.text(progression.chord_list[index] + " (" + get_chord_name(progression.chord_list[index]) + ")");
       chordEl.append($("<div class='clearfix'/>"));
       chordEl.append(chordLabel);
 
@@ -301,10 +292,14 @@ module.exports = {
 
     $(".chord_" + get_chord_classname(chord)).addClass("current");
 
+    var rows = [];
+
     if (available.length) {
       _.each(available, function(relative) {
         var keyEl = $(".key_" + get_chord_classname(relative[0]));
         keyEl.addClass("active");
+        var currentChordEl = keyEl.find(".chord_" + get_chord_classname(chord));
+        rows.push([keyEl, keyEl.find(".hist_key").index(currentChordEl)]);
 
         // Common chords between relative key and the current key...
         _.each(relative[2], function(chord) {
@@ -314,6 +309,24 @@ module.exports = {
       });
     }
 
+    var sorted_rows = _.sortBy(rows, function(row) {
+      return -row[1];
+      
+    });
+
+    var prepEl = function(el) {
+      var parent = el.parent();
+      parent.prepend(el);
+    };
+
+    _.each(sorted_rows, function(row_info) {
+      prepEl(row_info[0]);
+    });
+
+    var keyEl = $(".key_" + get_chord_classname(current_key));
+    prepEl(keyEl);
+    keyEl = $(".key_" + get_chord_classname(progression.modulations[index] || progression.key));
+    prepEl(keyEl);
 
   },
 
