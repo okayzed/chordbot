@@ -68,6 +68,8 @@ var MAJ_POINTS = {
     "ii": 1,
     "vii": 1,
     "vi": 1,
+    "bviM": 1,
+    "bviiM": 1,
     "V" : 1,
     "I" : 2,
     "sus" : -1,
@@ -80,15 +82,14 @@ var MIN_POINTS = {
     "ii": 1,
     "III": 1,
     "iv" : 1,
-    "bvii": 1,
     "VI": 1,
     "V": 1,
     "sus" : -1,
     "b" : -1
 };
 
-var MAJ_KEYS = ["IV", "iii", "ii", "vii", "vi", "V", "I", "b"]
-var MIN_KEYS = ["vii", "Im", "ii", "III", "iv", "VI", "V", "bvii", "b"]
+var MAJ_KEYS = ["IV", "iii", "ii", "vii", "vi", "V", "I", "bviM", "bviiM", "b" ];
+var MIN_KEYS = ["vii", "Im", "ii", "III", "iv", "VI", "V", "b"];
 
 var cached_labelings = {};
 
