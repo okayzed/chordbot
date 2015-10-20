@@ -95,11 +95,13 @@ module.exports = {
       overallEl.append(closehistEl);
       // the header for the progression is
 
-      parentEl.append("<div class='hist_head hist_key class_5'>&nbsp;</div>");
-      parentEl.append("<div class='hist_head hist_key class_4'>&nbsp;</div>");
-      parentEl.append("<div class='hist_head hist_key hist_key_2 class_3'>&nbsp;</div>");
-      parentEl.append("<div class='hist_head hist_key hist_key_2 class_2'>&nbsp;</div>");
-      parentEl.append("<div class='hist_head hist_key class_1'>&nbsp;</div>");
+      parentEl.append("<div class='hist_head hist_key class_5'>iii</div>");
+      parentEl.append("<div class='hist_head hist_key class_4'>vi</div>");
+      parentEl.append("<div class='hist_head hist_key class_3'>IV</div>");
+      parentEl.append("<div class='hist_head hist_key class_3'>ii</div>");
+      parentEl.append("<div class='hist_head hist_key class_2'>V</div>");
+      parentEl.append("<div class='hist_head hist_key class_2'>vii</div>");
+      parentEl.append("<div class='hist_head hist_key class_1'>I</div>");
       parentEl.append("<div class='col-md-12 col-xs-12 clearfix' >&nbsp;</div>");
     }
 
