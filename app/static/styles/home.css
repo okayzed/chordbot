@@ -1,3 +1,7 @@
+.progression_info {
+  font-weight: bold;
+}
+
 .arrow_box {
   position: relative;
 }
@@ -120,6 +124,7 @@ body {
     display: none;
   }
 
+  .hist_row.perm,
   .hist_row.active {
     display: block;
   }

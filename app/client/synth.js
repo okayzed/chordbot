@@ -32,7 +32,7 @@ module.exports = {
 
         setTimeout(function() { 
           synth.noteOff(midi);
-          synth.noteOn(midi, 80);
+          synth.noteOn(midi, 20);
         }, Math.min(i * 50, duration) - 50);
       }
 

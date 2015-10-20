@@ -15,16 +15,6 @@
 
 require("app/static/vendor/teoria");
 
-var read_progressions = [
-//  "F#M EM F#7 A"
-//  "Em GM Em GM",
-//  "A D A D A D F G A",
-//  "Dm GM CM AM Dm G7 CM Dm E7",
-//  "Ebm Gbm C#M",
-// "G Em G Em G Bm Am D G Em Bm G G D G Bm C D G C G Bm Am D G Em Bm Em G F D",
-//  "Ab Db Ab Db Fb Gb Ab"
-];
-
 var analysis = require("app/client/analysis");
 var Progression = require("app/client/progression");
 var normal = require("app/client/normal");
@@ -32,6 +22,16 @@ var generator = require("app/client/generator");
 
 var BARS_PER_LINE = 8;
 var LAST_SELECTED_INDEX;
+
+var SELECTED_KEY;
+var SELECTED_PROGRESSION;
+var SELECTED_CHORD;
+var SELECTED_CHORD_INDEX;
+
+function clean_line(line) {
+  var lines = _.filter(line.replace(/\s\s/g, " ").split(), function(l) { return l; });
+  return lines.join(" ");
+}
 
 function get_chord_classname(chord) {
   return get_chord_name(chord).replace("#", "s");
@@ -68,10 +68,47 @@ function get_chords_from_str(str) {
 
 
 var OPENED = false;
+function wipe_els(els) {
+  els.removeClass("active relative current common possible");
+}
+
 module.exports = {
   click_handler_uno: function() {
   },
   init: function() {
+
+  },
+
+  toggle_histogram: function() {
+    var line = clean_line($("textarea").val());
+
+    var progression = SELECTED_PROGRESSION;
+    console.log("PROG", progression, "CHORD", SELECTED_CHORD);
+
+    if (OPENED == SELECTED_CHORD) {
+      wipe_els($(".hist_row, .hist_key"));
+      module.exports.close_histogram();
+    } else {
+      OPENED = SELECTED_CHORD;
+      module.exports.open_histogram(progression);
+    }
+
+
+  },
+
+  open_histogram: function(progression) {
+    
+    var closehistEl = $(".close_hist");
+    closehistEl.text("close");
+
+    wipe_els($(".hist_row, .hist_key"));
+    module.exports.highlight_cells(progression, SELECTED_CHORD_INDEX);
+
+  },
+  close_histogram: function() {
+    OPENED = false;
+    var closehistEl = $(".close_hist");
+    closehistEl.text("show modulations");
 
   },
 
@@ -86,11 +123,9 @@ module.exports = {
 
     if (!$(".hist_head").length) {
       // get the hist out of the way
-      var closehistEl = $("<div class='rfloat' style='20px; cursor: pointer;' />");
-      closehistEl.text("Close");
+      var closehistEl = $("<div class='rfloat close_hist' style='20px; cursor: pointer;' />");
       closehistEl.on('click', function() {
-        OPENED = false;
-        $(".hist_key, .hist_row").removeClass("active relative current common possible");
+        module.exports.toggle_histogram();
       });
       overallEl.append(closehistEl);
       // the header for the progression is
@@ -108,10 +143,6 @@ module.exports = {
     overallEl.append(parentEl);
 
     var printed_keys = {};
-
-    var seen_chords = _.keys(histograms.unweighted.direct);
-    var seen_modulations = {};
-    var variations = progression.variations;
 
     var possible_keys = {};
     _.each(progression.variations.common_chord, function(mod_keys) {
@@ -136,11 +167,11 @@ module.exports = {
         return;
       }
 
-      var progression = [ "I", "vii", "V", "ii", "IV", "vi", "iii" ];
+      var funcession = [ "I", "vii", "V", "ii", "IV", "vi", "iii" ];
       if (!analysis.chord_is_major(key)) {
-        progression =   [ "Im", "vii", "V", "ii", "iv", "VI", "III" ];
+        funcession =   [ "Im", "vii", "V", "ii", "iv", "VI", "III" ];
       }
-      progression.reverse();
+      funcession.reverse();
 
       if (printed_keys[get_chord_name(key)]) {
         return;
@@ -151,7 +182,7 @@ module.exports = {
 
       var seen_key = false;
       var implied_key = false;
-      var mapped = _.map(progression, function(func, index) {
+      var mapped = _.map(funcession, function(func, index) {
         var chord = Progression.get_chord_for_function(func, key);
         var el = $("<div class='hist_key'/>");
         el.addClass("func_" + func);
@@ -177,10 +208,57 @@ module.exports = {
       });
 
       rowEl.append(mapped);
-      parentEl.append(rowEl);
+      if (get_chord_name(progression.key) === get_chord_name(key)) {
+        rowEl.addClass("active");
+        rowEl.addClass("perm");
+        parentEl.prepend(rowEl);
+      } else {
+        parentEl.append(rowEl);
+      }
     });
 
     return overallEl;
+
+
+  },
+
+  set_controls_for_progression: function(progression, progressions) {
+    var controlsEl = $(".progression_info");
+    controlsEl.removeClass("hidden");
+    var keySelect = controlsEl.find(".key_selector");
+    keySelect.empty();
+    console.log(keySelect);
+    console.log(progression);
+
+    _.each(progressions, function(prog) {
+      var optionEl = $("<option > </option>");
+      var chord_key = get_chord_name(prog.key);
+      chord_key = chord_key.slice(0, chord_key.length - 1);
+
+      optionEl.html(chord_key);
+      optionEl.attr('value', prog.key);
+
+      if (progression.key === prog.key) {
+        optionEl.attr('selected', true);
+      }
+      keySelect.append(optionEl);
+    });
+
+    var breaks = analysis.check_progression_grammar(progression.labeling);
+    var mod_breaks = analysis.check_progression_grammar(progression.mod_labeling);
+
+    controlsEl.find(".harmoniousness").html(progression.likeliness);
+    controlsEl.find(".mod_harmoniousness").html("NA");
+    controlsEl.find(".mod_grammar_breaks").html("NA");
+    controlsEl.find(".alternate_key").html("NA");
+    if (progression.mod_likeliness !== progression.likeliness) {
+      controlsEl.find(".mod_harmoniousness").html(progression.mod_likeliness);
+      controlsEl.find(".mod_grammar_breaks").html(_.keys(mod_breaks).length);
+      controlsEl.find(".alternate_key").html(_.uniq(_.values(progression.modulations)));
+    }
+
+    controlsEl.find(".grammar_breaks").html(_.keys(breaks).length);
+    controlsEl.find(".current_key").html(progression.key);
 
 
   },
@@ -199,7 +277,7 @@ module.exports = {
       }
 
       var current_key = progression.modulations[index] || progression.key;
-      var chordEl = $("<div class='lfloat mrl mll' style='width: 22%' />");
+      var chordEl = $("<div class='lfloat col-md-3 col-xs-6' />");
       chordEl.addClass("chord");
 
       if (grammar_breaks[index]) {
@@ -229,27 +307,17 @@ module.exports = {
         chordEl.append("<div>&nbsp;</div>");
       }
 
-      function wipe_els(els) {
-        els.removeClass("active relative current common possible");
-      }
-
       var open = false;
       chordEl.click(function() {
-        if (open && OPENED == chord) {
-          wipe_els($(".hist_row, .hist_key"));
-          $(".hover").removeClass("hover");
-          open = false;
-        } else {
-          OPENED = chord;
-          bootloader.require("app/client/synth", function(synth) {
-            synth.play_chord(analysis.get_flavored_key(progression.chord_list[index]));
-          });
-          open = true;
-          wipe_els($(".hist_row, .hist_key"));
-          module.exports.highlight_cells(progression, index);
-          $(".hover").removeClass("hover");
-          $(this).addClass("hover");
-        }
+        $(".hover").removeClass("hover");
+        $(this).addClass("hover");
+        var closehistEl = $(".close_hist");
+        closehistEl.html("show modulations");
+        SELECTED_CHORD = progression.chord_list[index];
+        SELECTED_CHORD_INDEX = index;
+        bootloader.require("app/client/synth", function(synth) {
+          synth.play_chord(analysis.get_flavored_key(progression.chord_list[index]));
+        });
       });
 
 
@@ -349,7 +417,7 @@ module.exports = {
   },
 
   analyze_progression_str: function(line) {
-    line = line.trim();
+    line = clean_line(line);
     var chord_list = get_chords_from_str(line);
 
     // We instantiate a progression class that should do what...?
@@ -366,7 +434,7 @@ module.exports = {
     });
 
     progressions  = _.sortBy(progressions, function(p) {
-      p.likeliness = analysis.decide_progression_likeliness(p.labeling.slice(0, 4));
+      p.likeliness = analysis.decide_progression_likeliness(p.labeling.slice(0, 8));
       return -p.likeliness;
     });
     progressions = progressions.slice(0, 5);
@@ -400,13 +468,25 @@ module.exports = {
     console.log("HARMONIOUSNESS", analysis.get_progression_harmoniousness(prog.mod_labeling), "BREAKS", analysis.check_progression_grammar(prog.mod_labeling));
 
     var self = this;
-    if (!self.progressions) {
-      self.progressions = {};
-    }
+    if (!self.progressions) { self.progressions = {}; }
+    if (!self.labelings) { self.labelings = {}; }
+
     self.progressions[line] = prog;
+
+    // revert to SELECTED one by UI
+    if (SELECTED_KEY) {
+      prog = _.find(sorted_progressions, function(p) {
+        return p.key === SELECTED_KEY;
+      });
+    }
+
+    SELECTED_PROGRESSION = prog;
+    self.labelings[line] = sorted_progressions;
 
     var uiEl = module.exports.build_ui_for_progression(prog);
     self.$el.find(".progression").append(uiEl);
+
+    module.exports.set_controls_for_progression(prog, sorted_progressions);
 
     setTimeout(function() {
       console.log("FINDING MODULATION OPPORTUNITIES");
@@ -415,8 +495,6 @@ module.exports = {
       var histEl = module.exports.build_histogram_for_progression(prog);
       self.$el.find(".histogram").append(histEl);
       
-      module.exports.highlight_cells(prog, LAST_SELECTED_INDEX || prog.chord_list.length - 1);
-      $($(".chord")[LAST_SELECTED_INDEX]).addClass("hover");
     }, 100);
 
 
@@ -429,7 +507,8 @@ module.exports = {
     $("form").css("margin-top", "50px");
     var chord_str = this.$el.find("textarea").val();
     var chord_strs = chord_str.split("\n");
-    var val = chord_str.trim();
+    var val = clean_line(chord_str);
+
     if (val === module.exports.old_val) {
       return;
     }
@@ -480,11 +559,46 @@ module.exports = {
     playNextChord();
 
   },
+  change_key: function(e) {
+    var key = $(e.target).val();
+    var progression;
+    var line = clean_line($("textarea").val());
+    var labelings = this.labelings[line];
+    _.each(labelings, function(p) {
+      if (progression) {
+        return;
+      }
+
+      console.log("KEY", key, p.key);
+
+      if (key === p.key) {
+        progression = p;
+      }
+    });
+
+    if (!progression.variations) {
+      progression.variations = generator.get_possible_variations(progression);
+    }
+
+    SELECTED_KEY = key;
+    SELECTED_PROGRESSION = progression;
+
+    this.$el.find(".histogram").empty();
+    this.$el.find(".progression").empty();
+
+    var histEl = this.build_histogram_for_progression(progression);
+    this.$el.find(".histogram").append(histEl);
+
+    var uiEl = module.exports.build_ui_for_progression(progression);
+    this.$el.find(".progression").append(uiEl);
+    this.set_controls_for_progression(progression, labelings);
+  },
   events: {
     "keydown textarea" : "analyze_chords",
     "click .analyze" : "analyze_chords",
     "click .play" : "play_chords",
-    "click .hist_key" : "click_chord"
+    "click .hist_key" : "click_chord",
+    "change .key_selector" : "change_key"
   }
 
 
