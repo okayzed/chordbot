@@ -55,6 +55,7 @@ function get_chords_from_str(str) {
   _.each(str.replace(/\s/g, " ").split(" "), function(token) {
     try {
 
+      token = normal.get_normal_chord(token);
       var chord = teoria.chord(token.trim().replace(/\s/, ""));
       chord_list.push(chord);
     } catch (e) {
@@ -356,7 +357,6 @@ module.exports = {
       progression.chord_list = chord_list;
 
 
-      normal.normalize_chord_list(chord_list, labeling, key);
       progressions.push(progression);
     });
 

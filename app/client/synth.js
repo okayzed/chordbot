@@ -1,3 +1,5 @@
+var normal = require("app/client/normal");
+
 var synth = T("SynthDef").play();
 
 synth.def = function(opts) {
@@ -15,9 +17,7 @@ synth.def = function(opts) {
 
 module.exports = {
   play_chord: function(chord, duration) {
-    if (chord.length > 1) {
-      chord = chord.replace(/d$/, "dim").replace(/D$/, "dom");
-    }
+    chord = normal.get_normal_chord(chord);
     var teoria_chord = teoria.chord(chord);
     duration = duration || 1000;
 
