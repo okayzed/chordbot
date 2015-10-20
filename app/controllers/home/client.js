@@ -108,7 +108,7 @@ module.exports = {
   close_histogram: function() {
     OPENED = false;
     var closehistEl = $(".close_hist");
-    closehistEl.text("show modulations");
+    closehistEl.text("mods");
 
   },
 
@@ -308,11 +308,16 @@ module.exports = {
       }
 
       var open = false;
+      chordEl.hover(function() {
+        $(".chord_hover").removeClass("chord_hover");
+        var chordEls = $(".chord_" + get_chord_classname(chord)).addClass("chord_hover");
+      }, function() { });
+
       chordEl.click(function() {
         $(".hover").removeClass("hover");
         $(this).addClass("hover");
         var closehistEl = $(".close_hist");
-        closehistEl.html("show modulations");
+        closehistEl.html("mods");
         SELECTED_CHORD = progression.chord_list[index];
         SELECTED_CHORD_INDEX = index;
         bootloader.require("app/client/synth", function(synth) {
