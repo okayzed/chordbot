@@ -17,8 +17,12 @@ synth.def = function(opts) {
 
 module.exports = {
   play_chord: function(chord, duration) {
+    try {
     chord = normal.get_normal_chord(chord);
     var teoria_chord = teoria.chord(chord);
+    } catch(e) {
+      return;
+    }
     duration = duration || 1000;
 
     var chord_notes = _.shuffle(teoria_chord.notes());

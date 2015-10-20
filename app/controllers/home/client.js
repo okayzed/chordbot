@@ -84,22 +84,24 @@ module.exports = {
     var parentEl = $("<div />");
     var overallEl = $("<div />");
 
-    // get the hist out of the way
-    var closehistEl = $("<div class='rfloat' style='20px; cursor: pointer;' />");
-    closehistEl.text("Close");
-    closehistEl.on('click', function() {
-      OPENED = false;
-      $(".hist_key, .hist_row").removeClass("active relative current common possible");
-    });
-    overallEl.append(closehistEl);
-    // the header for the progression is
+    if (!$(".hist_head").length) {
+      // get the hist out of the way
+      var closehistEl = $("<div class='rfloat' style='20px; cursor: pointer;' />");
+      closehistEl.text("Close");
+      closehistEl.on('click', function() {
+        OPENED = false;
+        $(".hist_key, .hist_row").removeClass("active relative current common possible");
+      });
+      overallEl.append(closehistEl);
+      // the header for the progression is
 
-    parentEl.append("<div class='hist_head hist_key class_1'>&nbsp;</div>");
-    parentEl.append("<div class='hist_head hist_key hist_key_2 class_2'>&nbsp;</div>");
-    parentEl.append("<div class='hist_head hist_key hist_key_2 class_3'>&nbsp;</div>");
-    parentEl.append("<div class='hist_head hist_key class_4'>&nbsp;</div>");
-    parentEl.append("<div class='hist_head hist_key class_5'>&nbsp;</div>");
-    parentEl.append("<div class='col-md-12 col-xs-12 clearfix' >&nbsp;</div>");
+      parentEl.append("<div class='hist_head hist_key class_5'>&nbsp;</div>");
+      parentEl.append("<div class='hist_head hist_key class_4'>&nbsp;</div>");
+      parentEl.append("<div class='hist_head hist_key hist_key_2 class_3'>&nbsp;</div>");
+      parentEl.append("<div class='hist_head hist_key hist_key_2 class_2'>&nbsp;</div>");
+      parentEl.append("<div class='hist_head hist_key class_1'>&nbsp;</div>");
+      parentEl.append("<div class='col-md-12 col-xs-12 clearfix' >&nbsp;</div>");
+    }
 
     overallEl.append(parentEl);
 
@@ -136,6 +138,7 @@ module.exports = {
       if (!analysis.chord_is_major(key)) {
         progression =   [ "Im", "vii", "V", "ii", "iv", "VI", "III" ];
       }
+      progression.reverse();
 
       if (printed_keys[get_chord_name(key)]) {
         return;
@@ -453,8 +456,7 @@ module.exports = {
     });
   },
   play_chords: function() {
-    var lines = $("textarea").val().replace(/\s\s/, " ").trim().split(" ");
-
+    var lines  = get_chords_from_str($("textarea").val());
     var index = 0;
     var playNextChord = function() {
       if (index >= lines.length) {
@@ -464,8 +466,7 @@ module.exports = {
       var duration = 1000;
 
       bootloader.require("app/client/synth", function(synth) {
-        console.log("PLAYING CHORDS", lines[index]);
-        synth.play_chord(lines[index], duration);
+        synth.play_chord(get_chord_name(lines[index]), duration);
         $(".chord").removeClass("playing");
         $($(".chord").get(index)).addClass("playing");
         index += 1;
