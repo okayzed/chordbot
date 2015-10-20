@@ -25,8 +25,8 @@ var lookup = {
 };
 
 function build_chords_for_key(key) {
-  var major_flavors = "MmmMMmd".split("");
-  var minor_flavors = "mdMmmMd".split("");
+  var major_flavors = "MmmMMmD".split("");
+  var minor_flavors = "mdMmmMD".split("");
 
   minor_flavors = _.map(minor_flavors, function(m) {
     return lookup[m];

@@ -95,12 +95,12 @@ module.exports = {
       overallEl.append(closehistEl);
       // the header for the progression is
 
-      parentEl.append("<div class='hist_head hist_key class_5'>iii</div>");
-      parentEl.append("<div class='hist_head hist_key class_4'>vi</div>");
+      parentEl.append("<div class='hist_head hist_key class_5 arrow_box'>iii</div>");
+      parentEl.append("<div class='hist_head hist_key class_4 arrow_box'>vi</div>");
       parentEl.append("<div class='hist_head hist_key class_3'>IV</div>");
-      parentEl.append("<div class='hist_head hist_key class_3'>ii</div>");
+      parentEl.append("<div class='hist_head hist_key class_3 arrow_box'>ii</div>");
       parentEl.append("<div class='hist_head hist_key class_2'>V</div>");
-      parentEl.append("<div class='hist_head hist_key class_2'>vii</div>");
+      parentEl.append("<div class='hist_head hist_key class_2 arrow_box'>vii</div>");
       parentEl.append("<div class='hist_head hist_key class_1'>I</div>");
       parentEl.append("<div class='col-md-12 col-xs-12 clearfix' >&nbsp;</div>");
     }
@@ -261,7 +261,7 @@ module.exports = {
   },
 
   highlight_cells: function(progression, index) {
-    LAST_SELECTED_INDEX = index;
+    LAST_SELECTED_INDEX = index + 1;
     var current_key = progression.modulations[index] || progression.key;
     var chord = progression.chord_list[index];
     var relative_modulations = progression.variations.relative;

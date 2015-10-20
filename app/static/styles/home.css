@@ -1,3 +1,20 @@
+.arrow_box {
+  position: relative;
+}
+.arrow_box:after {
+  left: 100%;
+  top: 50%;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+  border-left-color: #fff;
+  border-width: 1em;
+  margin-top: -1em;
+}
+
 body {
   padding-bottom: 200px;
 }
@@ -75,6 +92,7 @@ body {
     cursor: pointer;
     padding-right: 1%;
     padding-left: 1%;
+    text-align: right;
     float: left;
 
      -webkit-user-select: none;  /* Chrome all / Safari all */
@@ -130,7 +148,7 @@ body {
   .hist_key.common {
     opacity: 1;
     border-width: 2px;
-    border-left: 5px solid #3ff;
+    border-right: 5px solid #3ff;
 /*     background-color: #aff; */
 /*     color: #000; */
   }
@@ -139,7 +157,7 @@ body {
     border-width: 2px;
 /*     background-color: #afa; */
 /*     color: #000; */
-    border-left: 5px solid #3f6;
+    border-right: 5px solid #3f6;
   }
 
   .hist_key.current {
@@ -163,12 +181,12 @@ body {
 
 
 .hist_key.class_1 {
-  background-color: #babdb6;
+  background-color: #555753;
 }
 
 .hist_key_2.class_2,
 .hist_key.class_2 {
-  background-color: #fcaf3e;
+  background-color: #ed5f00;
 }
 .hist_key_2.class_3,
 .hist_key.class_3 {
