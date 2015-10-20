@@ -295,6 +295,13 @@ module.exports = {
       chordEl.addClass("relative");
     });
 
+    var chord_key = analysis.get_flavored_key(chord);
+    var keys_with_chord = bootloader.require("app/client/grammar").KEYS_WITH_CHORD[chord_key];
+    console.log("KEYS WITH CHORD", keys_with_chord);
+    _.each(keys_with_chord, function(interval, dest_key) {
+        available.push([analysis.get_flavored_key(dest_key), chord_key, []]);
+    });
+
     $(".chord_" + get_chord_classname(chord)).addClass("current");
 
     var rows = [];

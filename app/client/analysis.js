@@ -16,6 +16,14 @@ function get_flavored_key(chord_ish, flavor) {
       if (quality === "minor") {
         flavor = "m";
       }
+
+      if (quality === "diminished") {
+        flavor = "d";
+      }
+
+      if (quality === "dominant") {
+        flavor = "D";
+      }
     }
 
     return chord_ish.root.name() + chord_ish.root.accidental() + flavor;
@@ -336,10 +344,15 @@ module.exports = {
           // add the implied minor to the implied_hist...
           relative = chord.root.interval("M6");
           implied_hist.add(get_flavored_key(relative, "m"));
-        } else {
+        } else if (chord.quality() == "minor") {
           key_hist.add(get_flavored_key(chord, "m"));
           relative = chord.root.interval("m3");
           implied_hist.add(get_flavored_key(relative, "m"));
+        } else if (chord.quality() == "diminished") {
+          key_hist.add(get_flavored_key(chord, "dim"));
+          relative = chord.root.interval("m3");
+          implied_hist.add(get_flavored_key(relative, "dim"));
+
         }
       });
 

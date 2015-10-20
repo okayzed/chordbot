@@ -17,10 +17,6 @@ function get_chord_names(intersected, mod_key) {
 
     });
 
-    if (!intersected_with_names.length) {
-      return;
-    }
-
     return intersected_with_names;
   }
 }
@@ -72,7 +68,12 @@ function get_common_chord_modulations(progression) {
 
       var chord_key = analysis.get_flavored_key(chord);
       var relatives = relative_modulations[chord_key];
-      relatives[chord_key] = 'original';
+      if (!relatives) {
+        var simple_key = analysis.get_chord_key(chord) + "M";
+        relatives = relative_modulations[simple_key];
+      } else {
+        relatives[chord_key] = 'original';
+      }
 
       _.each(relatives, function(reason, relative) {
         var chord_key = analysis.get_flavored_key(relative);

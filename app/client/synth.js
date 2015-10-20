@@ -15,17 +15,26 @@ synth.def = function(opts) {
 
 module.exports = {
   play_chord: function(chord, duration) {
+    if (chord.length > 1) {
+      chord = chord.replace(/d$/, "dim").replace(/D$/, "dom");
+    }
     var teoria_chord = teoria.chord(chord);
     duration = duration || 1000;
 
     var chord_notes = _.shuffle(teoria_chord.notes());
     _.each(chord_notes, function(note, index) {
       var midi = note.midi();
-      synth.noteOn(midi, 80);
+      for (var i = 0; i < 4; i++ ){
+
+        setTimeout(function() { 
+          synth.noteOff(midi);
+          synth.noteOn(midi, 80);
+        }, Math.min(i * 50, duration) - 50);
+      }
 
       setTimeout(function() {
         synth.noteOff(midi);
-      }, duration - 50);
+      }, duration + 50);
 
     });
   }

@@ -17,9 +17,24 @@ var KEYS_HAVE_CHORD = {};
 var FUNCTIONS_FOR_KEY = {};
 
 
+var lookup = {
+  "m" : "m",
+  "M" : "M",
+  "d" : "dim",
+  "D" : "dom"
+};
+
 function build_chords_for_key(key) {
-  var major_flavors = "MmmMMmm";
-  var minor_flavors = "mmMmmMm";
+  var major_flavors = "MmmMMmd".split("");
+  var minor_flavors = "mdMmmMd".split("");
+
+  minor_flavors = _.map(minor_flavors, function(m) {
+    return lookup[m];
+  });
+
+  major_flavors = _.map(major_flavors, function(m) {
+    return lookup[m];
+  });
 
   var major_functions = "I ii iii IV V vi vii".split(" ");
   var minor_functions = "Im ii III iv v VI vii".split(" ");
@@ -47,7 +62,7 @@ function build_chords_for_key(key) {
     KEYS_HAVE_CHORD[flavored_note][minor_key] = index + 1;
 
     FUNCTIONS_FOR_KEY[minor_key][minor_functions[index]] = flavored_note;
-    FUNCTIONS_FOR_KEY[key][major_functions[index]] = flavored_note;
+    FUNCTIONS_FOR_KEY[key][minor_functions[index]] = flavored_note;
   });
 
   var major_scale = teoria.note(key).scale('major').simple();

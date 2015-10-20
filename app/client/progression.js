@@ -32,17 +32,17 @@ module.exports = {
       var chord_key = analysis.get_flavored_key(root);
       var simple_key = analysis.get_chord_key(root);
 
-      chord_name = grammar.FUNCTIONS_FOR_KEY[simple_key][func];
+      chord_name = grammar.FUNCTIONS_FOR_KEY[chord_key][func];
       if (!chord_name) {
-        chord_name = grammar.FUNCTIONS_FOR_KEY[chord_key][func];
+        chord_name = grammar.FUNCTIONS_FOR_KEY[simple_key][func];
       }
 
       // maybe we try one more time, but inverting values...
       if (!chord_name) {
         func = func.toUpperCase();
-        chord_name = grammar.FUNCTIONS_FOR_KEY[simple_key][func];
+        chord_name = grammar.FUNCTIONS_FOR_KEY[chord_key][func];
         if (!chord_name) {
-          chord_name = grammar.FUNCTIONS_FOR_KEY[chord_key][func];
+          chord_name = grammar.FUNCTIONS_FOR_KEY[simple_key][func];
         }
 
         if (chord_name) {
@@ -142,6 +142,7 @@ module.exports = {
     var lookup = {
       "major" : "M",
       "dominant" : "7",
+      "diminished" : "dim",
       "minor" : "m"
     };
 
