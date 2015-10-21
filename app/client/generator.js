@@ -35,10 +35,16 @@ function get_intersection(chord_key, current_key, mod_key) {
   var intersected = {};
   var candidates = [];
   _.each(mod_candidate_chords, function(mc) {
+    if (!mc) {
+      return;
+    }
     intersected[analysis.get_simple_key(mc)] = mc;
   });
 
   _.each(candidate_chords, function(c) {
+    if (!c) {
+      return;
+    }
     if (intersected[analysis.get_simple_key(c)]) {
       candidates.push(c);
       candidates.push(intersected[analysis.get_simple_key(c)]);

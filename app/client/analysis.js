@@ -150,24 +150,13 @@ function get_progression_harmoniousness(labeling) {
   return cached_harmoniousness[labeling_key];
 }
 
-var cached_grammar_checks = {};
 function check_progression_grammar(labeling) {
-  var labeling_key = labeling.join(",");
-  if (!cached_grammar_checks[labeling_key]) {
-    cached_grammar_checks[labeling_key] = grammar.check_progression_grammar(labeling);
-  }
+  return _.keys(grammar.check_progression_grammar(labeling)).length;
 
-  return _.keys(cached_grammar_checks[labeling_key]).length;
 }
 
 function get_progression_breaks(labeling) {
-  var labeling_key = labeling.join(",");
-  if (!cached_grammar_checks[labeling_key]) {
-    cached_grammar_checks[labeling_key] = grammar.check_progression_grammar(labeling);
-  }
-
-  console.log("BREAKS ARE", cached_grammar_checks[labeling_key]);
-  return cached_grammar_checks[labeling_key];
+  return grammar.check_progression_grammar(labeling);
 
 }
 
@@ -389,6 +378,29 @@ module.exports = {
   },
   get_progression_breaks: get_progression_breaks,
   get_progression_candidate_chords: get_progression_candidate_chords,
-  get_simple_key: get_simple_key
+  get_simple_key: get_simple_key,
+  use_blues_grammar: function() {
+    module.exports.reset();
+    grammar.add_grammar("blues", "IV iv v V Vm | v V IV | I");
+    grammar.add_grammar("minor blues", "iv IV v V Vm | v V IV | Im");
+  },
+  use_diatonic_grammar: function() {
+    module.exports.reset();
+    grammar.add_grammar("major", grammar.MAJOR_GRAMMAR);
+    grammar.add_grammar("minor", grammar.MINOR_GRAMMAR);
+  },
+  use_custom_grammar: function(name, grammar_str) {
+    module.exports.reset();
+    grammar.add_grammar(name, grammar_str);
+  },
+  reset: function() {
+    grammar.reset_grammars();
+
+    try { SF.controller().trigger("reset_grammar"); } catch(e) { }
+    cached_labelings = {};
+    cached_harmoniousness = {};
+  }
 };
 
+
+module.exports.use_diatonic_grammar();

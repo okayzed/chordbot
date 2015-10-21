@@ -77,6 +77,12 @@ module.exports = {
   click_handler_uno: function() {
   },
   init: function() {
+    var self = this;
+    self.on("reset_grammar", function() {
+      console.log("RESETTING OLD GRAMMAR");
+      module.exports.old_val = false;
+      self.analyze_chords();
+    });
 
   },
 
@@ -123,8 +129,9 @@ module.exports = {
     if (!$(".hist_head").length) {
       // get the hist out of the way
       var closehistEl = $("<a href='#' class='rfloat close_hist' style='20px; cursor: pointer; text-decoration: underline; color: #ddd;' />");
-      closehistEl.on('click', function() {
+      closehistEl.on('click', function(e) {
         module.exports.toggle_histogram();
+        e.preventDefault();
       });
       overallEl.append(closehistEl);
       // the header for the progression is

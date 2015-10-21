@@ -4,11 +4,6 @@ var Progression = require("app/client/progression");
 var MAJOR_GRAMMAR = "iii | vi | ii IV | V vii | I";
 var MINOR_GRAMMAR = "III | VI vi | ii IV iv | v V vii | I";
 
-var MAJOR_GRAMMAR_MATRIX = {};
-var MINOR_GRAMMAR_MATRIX = {};
-var MAJOR_GRAMMAR_CLASSES = {};
-var MINOR_GRAMMAR_CLASSES = {};
-
 var CHORDS_IN_KEY = {};
 
 // KEYS HAVE CHORD IS A LOOKUP THAT SHOWS WHAT OTHER KEYS CONTAIN A CHORD AND
@@ -153,19 +148,29 @@ function get_progression_candidates(chord, key) {
   // We are pretending like b and # chords are substitutes for what they are on
   var stripped_func = func.replace(/[mM7]/, "").replace(/^[b#]/, "");
 
-  add_grammar_to_candidates(candidates, func, MAJOR_GRAMMAR_MATRIX, MAJOR_GRAMMAR_CLASSES);
-  add_grammar_to_candidates(candidates, func, MINOR_GRAMMAR_MATRIX, MINOR_GRAMMAR_CLASSES);
-  add_grammar_to_candidates(candidates, stripped_func, MAJOR_GRAMMAR_MATRIX, MAJOR_GRAMMAR_CLASSES);
-  add_grammar_to_candidates(candidates, stripped_func, MINOR_GRAMMAR_MATRIX, MINOR_GRAMMAR_CLASSES);
+  _.each(GRAMMARS, function(grammar) {
+    add_grammar_to_candidates(candidates, func, grammar.matrix, grammar.classes);
+    add_grammar_to_candidates(candidates, stripped_func, grammar.matrix, grammar.classes);
 
-  if (func === "I") {
-    _.each(MAJOR_GRAMMAR_MATRIX, function(val, key) {
+  });
+
+  if (func === "I" && GRAMMARS.major) {
+    _.each(GRAMMARS.major.matrix, function(val, key) {
       candidates[key] = 1;
     });
 
-  } else if (func === "Im") {
-    _.each(MINOR_GRAMMAR_MATRIX, function(val, key) {
+  } else if (func === "Im" && GRAMMARS.minor) {
+    _.each(GRAMMARS.minor.matrix, function(val, key) {
       candidates[key] = 1;
+    });
+
+  } else if (func === "I" || func === "Im") {
+    _.each(GRAMMARS, function(grammar) {
+      if (typeof grammar.matrix[func] !== "undefined") {
+        _.each(grammar.matrix, function(val, key) {
+          candidates[key] = 1;
+        });
+      }
     });
 
   }
@@ -189,34 +194,31 @@ function check_progression_grammar(labeling) {
   _.each(labeling, function(chord, index) {
     chord = chord.replace("M6", "").replace("7", "");
     if (prev_chord) {
-      var prev_in_major_grammar = _.contains(_.keys(MAJOR_GRAMMAR_MATRIX), prev_chord);
-      var prev_in_minor_grammar = _.contains(_.keys(MINOR_GRAMMAR_MATRIX), prev_chord);
-
-      var in_major_grammar = _.contains(_.keys(MAJOR_GRAMMAR_MATRIX), chord);
-      var in_minor_grammar = _.contains(_.keys(MINOR_GRAMMAR_MATRIX), chord);
-
       if (prev_chord === chord) {
         return;
       }
 
-      if (!in_major_grammar && !in_minor_grammar) {
+      var miss = true;
+      _.each(GRAMMARS, function(grammar) {
+        var prev_in_major_grammar = _.contains(_.keys(grammar.matrix), prev_chord);
+        var in_major_grammar = _.contains(_.keys(grammar.matrix), chord);
+
+        if (in_major_grammar) {
+          miss = false;
+        }
+
+        if (prev_in_major_grammar && in_major_grammar) {
+          if (check_grammar(prev_chord, chord, grammar.matrix)) {
+            issues[index] = 'break';
+          }
+        }
+
+
+      });
+
+      if (miss) {
         issues[index] = 'miss';
-        return;
       }
-
-      if (prev_in_minor_grammar && in_minor_grammar) {
-        if (check_grammar(prev_chord, chord, MINOR_GRAMMAR_MATRIX)) {
-          issues[index] = 'break';
-
-        }
-      }
-
-      if (prev_in_major_grammar && in_major_grammar) {
-        if (check_grammar(prev_chord, chord, MAJOR_GRAMMAR_MATRIX)) {
-          issues[index] = 'break';
-        }
-      }
-
     }
 
     prev_chord = chord;
@@ -228,13 +230,35 @@ function check_progression_grammar(labeling) {
 
 }
 
-update_grammar_matrix(MAJOR_GRAMMAR, MAJOR_GRAMMAR_MATRIX, MAJOR_GRAMMAR_CLASSES);
-update_grammar_matrix(MINOR_GRAMMAR, MINOR_GRAMMAR_MATRIX, MINOR_GRAMMAR_CLASSES);
+var GRAMMARS = {};
+function add_grammar(name, grammar) {
+  console.log("ADDING GRAMMAR", name, grammar);
+  var matrix = {};
+  var classes = {};
+  var grammar_obj = {
+    name: name,
+    grammar: grammar,
+    classes: classes,
+    matrix: matrix
+  };
+
+  GRAMMARS[name] = grammar_obj;
+  update_grammar_matrix(grammar, matrix, classes);
+  return grammar_obj;
+}
 
 module.exports = {
+  reset_grammars: function() {
+    console.log("RESETTING GRAMMARS");
+    GRAMMARS = {};
+    cached_grammar_checks = {};
+  },
+  add_grammar: add_grammar,
   check_progression_grammar: check_progression_grammar,
   get_progression_candidates: get_progression_candidates,
   KEYS_WITH_CHORD: KEYS_HAVE_CHORD,
   CHORDS_IN_KEY: CHORDS_IN_KEY,
-  FUNCTIONS_FOR_KEY: FUNCTIONS_FOR_KEY
+  FUNCTIONS_FOR_KEY: FUNCTIONS_FOR_KEY,
+  MAJOR_GRAMMAR: MAJOR_GRAMMAR,
+  MINOR_GRAMMAR: MINOR_GRAMMAR
 };
