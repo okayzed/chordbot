@@ -255,26 +255,25 @@ module.exports = {
     var likeliness_ratio = parseInt(progression.likeliness / progression.chord_list.length * 100, 10);
     // likeliness is between 200 and -200 or something
     var likeEl = controlsEl.find(".likeliness_ratio");
-    likeEl.css("margin-top", "20px");
     likeEl.css("line-height", "2em");
     if (likeliness_ratio > 150) {
       likeEl.css("border", "5px solid #15d115");
       likeEl.html("great fit");
 
     } else if (likeliness_ratio > 100) {
-      likeEl.css("border", "5px solid #73d216");
+      likeEl.css("border-bottom", "5px solid #73d216");
       likeEl.html("good fit");
     } else if (likeliness_ratio > 80) {
-        likeEl.css("border", "5px solid #73d216");
+        likeEl.css("border-bottom", "5px solid #73d216");
         likeEl.html("fit");
     } else if (likeliness_ratio > 60) {
-        likeEl.css("border", "5px solid #edd400");
+        likeEl.css("border-bottom", "5px solid #edd400");
         likeEl.html("maybe fit?");
     } else if (likeliness_ratio > 40) {
-      likeEl.css("border", "5px solid #f57900");
+      likeEl.css("border-bottom", "5px solid #f57900");
       likeEl.html("uhhh...");
     } else if (likeliness_ratio > 0) {
-      likeEl.css("border", "5px solid #f50000");
+      likeEl.css("border-bottom", "5px solid #f50000");
       likeEl.html("pretty unlikely");
     } else if (likeliness_ratio > -50) {
       likeEl.css("border-bottom", "5px solid #000");
