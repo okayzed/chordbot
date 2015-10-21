@@ -221,7 +221,7 @@ function check_progression_grammar(labeling) {
     prev_chord = chord;
   });
 
-  cached_grammar_checks[labeling_key] = misses + breaks;
+  cached_grammar_checks[labeling_key] = issues;
 
   return issues;
 

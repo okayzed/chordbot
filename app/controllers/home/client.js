@@ -251,11 +251,11 @@ module.exports = {
     controlsEl.find(".alternate_key").html("NA");
     if (progression.mod_likeliness !== progression.likeliness) {
       controlsEl.find(".mod_harmoniousness").html(progression.mod_likeliness);
-      controlsEl.find(".mod_grammar_breaks").html(_.keys(mod_breaks).length);
+      controlsEl.find(".mod_grammar_breaks").html(mod_breaks);
       controlsEl.find(".alternate_key").html(_.uniq(_.values(progression.modulations)));
     }
 
-    controlsEl.find(".grammar_breaks").html(_.keys(breaks).length);
+    controlsEl.find(".grammar_breaks").html(breaks);
     controlsEl.find(".current_key").html(progression.key);
 
 
