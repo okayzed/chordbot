@@ -4,7 +4,14 @@ module.exports = {
   get_normal_chord: function(chord, current_key) {
     // TODO: fill this out to normalize # into flat keys
     if (chord.length > 1) {
-      chord = chord.replace(/d$/, "dim").replace(/D$/, "7");
+      if (chord.indexOf("/") != -1) {
+        var chords = chord.split("/");
+        chord = chords[0];
+        chord = chord.replace(/d$/, "dim").replace(/D$/, "dom");
+        chord = chord + "/" + chords[1];
+        return chord;
+      }
+      chord = chord.replace(/d$/, "dim").replace(/D$/, "dom");
     }
     return chord;
   },

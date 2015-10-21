@@ -122,7 +122,7 @@ module.exports = {
 
     if (!$(".hist_head").length) {
       // get the hist out of the way
-      var closehistEl = $("<div class='rfloat close_hist' style='20px; cursor: pointer;' />");
+      var closehistEl = $("<a href='#' class='rfloat close_hist' style='20px; cursor: pointer; text-decoration: underline; color: #ddd;' />");
       closehistEl.on('click', function() {
         module.exports.toggle_histogram();
       });
