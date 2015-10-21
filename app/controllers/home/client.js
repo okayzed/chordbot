@@ -40,7 +40,8 @@ function get_chord_classname(chord) {
 function get_chord_name(chord) {
   try {
     var chord_name = analysis.get_flavored_key(chord);
-    return chord_name[0].toUpperCase() + chord_name.slice(1);
+    chord_name = chord_name[0].toUpperCase() + chord_name.slice(1);
+    return chord_name.replace("dom", "D").replace("dim", "d");
   } catch(e) {
     return chord;
   }
@@ -98,7 +99,7 @@ module.exports = {
   open_histogram: function(progression) {
     
     var closehistEl = $(".close_hist");
-    closehistEl.html("<span class='glyphicon glyphicon-minus' />");
+    closehistEl.html("<span class='' />close</span>");
 
     wipe_els($(".hist_row, .hist_key"));
     module.exports.highlight_cells(progression, SELECTED_CHORD_INDEX);
@@ -107,7 +108,7 @@ module.exports = {
   close_histogram: function() {
     OPENED = false;
     var closehistEl = $(".close_hist");
-    closehistEl.html("<span class='glyphicon glyphicon-search' />");
+    closehistEl.html("<span class=''>mods</span>");
   },
 
   build_histogram_for_progression: function(progression) {
@@ -314,9 +315,9 @@ module.exports = {
         $(".hover").removeClass("hover");
         $(this).addClass("hover");
         var closehistEl = $(".close_hist");
-        closehistEl.html("<span class='glyphicon glyphicon-search' />");
+        closehistEl.html("<span>mods</span>");
 
-        if (SELECTED_CHORD !== chord) {
+        if (get_chord_name(SELECTED_CHORD) !== get_chord_name(chord)) {
           closehistEl.fadeOut(function() {
             closehistEl.fadeIn();
           });
@@ -514,7 +515,6 @@ module.exports = {
   analyze_chords: _.debounce(function() {
     $("form").css("margin-top", "50px");
     var chord_str = this.$el.find("textarea").val();
-    var chord_strs = chord_str.split("\n");
     var val = clean_line(chord_str);
 
     if (val === module.exports.old_val) {
@@ -528,12 +528,7 @@ module.exports = {
   
     var self = this;
     setTimeout(function() {
-      _.each(chord_strs, function(chord_str) {
-        try {
-          self.analyze_progression_str(chord_str);
-        } catch (e) {
-        }
-      });
+      self.analyze_progression_str(chord_str);
       $(".loading").hide();
     }, 100);
   }, 500),
