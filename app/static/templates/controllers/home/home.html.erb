@@ -3,25 +3,45 @@
 <% 
 
   var examples = [
-    "AM D AM D F G Am",
+    "AM D AM D F G A",
     "Gm E Gm E",
     "Dm GM CM AM Dm G7 CM Dm E7",
     "Ab Db Ab Db Fb Gb Ab",
-    "G Em G Em G Bm Am D G Em Bm G G D G Bm C D G C G Bm Am D G Em Bm Em G F D"
+    "G Em G Em G Bm Am D G Em Bm G ",
+    "G D G Bm C D G C G Bm Am D G Em Bm Em G F D",
+    "D D D D D D am7 D7/A G G D bm D A7 D "
   ];
 %>
 
 <div class="container" style="margin: auto; margin-top: 10px; padding-bottom: 200px">
+  <div class='not_that_helpful_info collapse'>
+    <h1>what next? <small><a href='#' data-toggle='collapse' data-target='.not_that_helpful_info'>close</a></small></h1> 
 
-  <form class='form' style='margin-top: 200px'>
+    <p>
+    <b>chord bot</b> (imprisoned below)  is a song-writer's mediocre friend. an
+    acquaintance, really. he listens to your chord progressions and then gives
+    helpful (and unhelpful) advice. and maybe goes on for a bit too long.
+    </p>
+
+    <p>
+    chord bot uses <b>chord grammars</b> to guess the labeling (I, ii, IV, etc)
+    of the chords its been eating. once digested, chord bot will then give
+    recommendations on where to move the song from any given chord. using the
+    modulations table, chord bot gauges the effect of different chords on the
+    overall 'feeling' of the song. unfortunately, he can't talk - only sing.
+  </div>
+  <form class='form' style='margin-top: 20px'>
     <textarea class='form-control' style='width: 100%'><%= examples[_.random(examples.length-1)] %></textarea>
   </form>
 
-  <div class='mtl btn btn-default analyze' style='font-family: monospace; width: 49%;'>
+  <div class='mtl btn btn-default analyze' style='font-family: monospace; width: 50%;'>
     FEED CHORD BOT
   </div>
-  <div class='mtl btn btn-default play rfloat mbl' style='font-family: monospace; width: 49%;'>
-    HEAR CHORD BOT
+  <div class='mtl btn btn-default play rfloat mbl' style='font-family: monospace; width: 24%;'>
+    PLAY
+  </div>
+  <div class='mtl btn btn-default rfloat mbl' style='font-family: monospace; width: 24%;' data-toggle="collapse" data-target=".not_that_helpful_info">
+    WHAT NEXT?
   </div>
 
   <div class="loading" style="display: none; text-align: center; padding-top: 40px;" > 

@@ -3,6 +3,7 @@ var Progression = require("app/client/progression");
 // http://www.dangutwein.net/courses/mus201/handouts/har_mot.htm
 var MAJOR_GRAMMAR = "iii | vi | ii IV | V vii | I";
 var MINOR_GRAMMAR = "III | VI vi | ii IV iv | v V vii | I";
+
 var MAJOR_GRAMMAR_MATRIX = {};
 var MINOR_GRAMMAR_MATRIX = {};
 var MAJOR_GRAMMAR_CLASSES = {};

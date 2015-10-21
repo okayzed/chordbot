@@ -513,7 +513,6 @@ module.exports = {
     this.$el.find(id).show();
   },
   analyze_chords: _.debounce(function() {
-    $("form").css("margin-top", "50px");
     var chord_str = this.$el.find("textarea").val();
     var val = clean_line(chord_str);
 
