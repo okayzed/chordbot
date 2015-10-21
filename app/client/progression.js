@@ -8,9 +8,20 @@ module.exports = {
   get_chord_for_function: function(func, root) {
     var acc = -1;
     var chord_name;
+    var quality;
     bootloader.js(["app/client/grammar", "app/client/analysis"], function() {
       var grammar = bootloader.require("app/client/grammar");
       var analysis = bootloader.require("app/client/analysis");
+
+      if (func.match(/m$/)) {
+        quality = "m";
+      }
+      if (func.match(/M$/)) {
+        quality = "M";
+      }
+      func = func.replace(/[mM]$/, "");
+
+
 
       acc = 0;
       while (func.match(/b/)) {
@@ -84,7 +95,7 @@ module.exports = {
         acc += delta;
 
         var chord = teoria.chord(chord_name);
-        var chord_quality = "M";
+        var chord_quality = quality || "M";
         if (chord.quality() == "minor") {
           chord_quality = "m";
         }
