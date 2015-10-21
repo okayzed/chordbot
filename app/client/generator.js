@@ -32,7 +32,21 @@ function get_intersection(chord_key, current_key, mod_key) {
   var candidate_chords = analysis.get_progression_candidate_chords(chord_key, current_key);
   var mod_candidate_chords  = analysis.get_progression_candidate_chords(chord_key, mod_key);
 
-  var intersected = _.intersection(mod_candidate_chords, candidate_chords);
+  var intersected = {};
+  var candidates = [];
+  _.each(mod_candidate_chords, function(mc) {
+    intersected[analysis.get_simple_key(mc)] = mc;
+  });
+
+  _.each(candidate_chords, function(c) {
+    if (intersected[analysis.get_simple_key(c)]) {
+      candidates.push(c);
+      candidates.push(intersected[analysis.get_simple_key(c)]);
+    }
+
+  });
+
+  intersected = _.uniq(candidates);
 
   cached_intersections[cache_key] = intersected;
   return intersected;
@@ -43,6 +57,8 @@ function get_common_chord_modulations(progression) {
   var candidates = {};
   var checked_keys = progression.checked_keys || {};
   progression.checked_keys = {};
+
+  console.log("RELATIVE MODULATIONS", relative_modulations);
 
   var relative_modulations = progression.variations.relative;
   _.each(progression.chord_list, function(chord, index) {
@@ -76,8 +92,18 @@ function get_common_chord_modulations(progression) {
       }
 
       _.each(relatives, function(reason, relative) {
-        var chord_key = analysis.get_flavored_key(relative);
+        var flavored_key = analysis.get_flavored_key(relative);
+        var chord_key = analysis.get_simple_key(relative);
+
         var keys_with_chords = grammar.KEYS_WITH_CHORD[chord_key];
+        var other_keys_with_chords = grammar.KEYS_WITH_CHORD[flavored_key];
+        if (!keys_with_chords) {
+          keys_with_chords = other_keys_with_chords;
+        } else {
+          keys_with_chords = _.extend(keys_with_chords, other_keys_with_chords);
+        }
+
+
         _.each(keys_with_chords, function(index, mod_key) {
           var intersected = get_intersection(chord_key, analysis.get_chord_key(current_key), mod_key);
           var intersected_with_names = get_chord_names(intersected, mod_key);
@@ -116,17 +142,18 @@ function get_relative_modulations(progression) {
     }
 
     candidates[chord_key + chord_quality] = {};
-    if (chord.quality() == "major" || chord.quality() == "dominant") {
+    if (analysis.chord_is_major(chord)) {
       candidates[chord_key + chord_quality][chord_key + "m"] = "p. min";
       var relative = teoria.note(chord_key).interval("M6");
       candidates[chord_key + chord_quality][relative.name() + relative.accidental() + "m"] = "r. min";
 
       if (chord.quality() == "dominant") {
         var implied_key = analysis.get_chord_key(teoria.note(chord_key).interval("P4").name());
+        candidates[chord_key + chord_quality][chord_key + "7"] = "original";
         candidates[chord_key + chord_quality][implied_key + "M"] = "res 7";
       } else {
         var implied_key = analysis.get_chord_key(teoria.note(chord_key).interval("P4").name());
-        candidates[chord_key + chord_quality][chord_key + "M7"] = "dom7";
+        candidates[chord_key + chord_quality][chord_key + "7"] = "dom7";
         candidates[chord_key + chord_quality][implied_key + "M"] = "res7";
 
       }

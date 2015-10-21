@@ -25,7 +25,7 @@ var lookup = {
 };
 
 function build_chords_for_key(key) {
-  var major_flavors = "MmmMMmD".split("");
+  var major_flavors = "MmmMMmd".split("");
   var minor_flavors = "mdMmmMD".split("");
 
   minor_flavors = _.map(minor_flavors, function(m) {
@@ -150,7 +150,7 @@ function get_progression_candidates(chord, key) {
   var func = Progression.determine_function(chord, key);
 
   // We are pretending like b and # chords are substitutes for what they are on
-  var stripped_func = func.replace(/[mM]/, "").replace(/^[b#]/, "");
+  var stripped_func = func.replace(/[mM7]/, "").replace(/^[b#]/, "");
 
   add_grammar_to_candidates(candidates, func, MAJOR_GRAMMAR_MATRIX, MAJOR_GRAMMAR_CLASSES);
   add_grammar_to_candidates(candidates, func, MINOR_GRAMMAR_MATRIX, MINOR_GRAMMAR_CLASSES);

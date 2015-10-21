@@ -4,6 +4,20 @@ var major_progression = [ "I", "ii", "iii", "IV", "V", "vi", "vii" ];
 var minor_progression = [ "Im", "ii", "iii", "iv", "V", "VI", "vii" ];
 var Progression = require("app/client/progression");
 
+var MIN_SUFFIX = "m";
+var MAJ_SUFFIX = "M";
+var DOM_SUFFIX = "dom";
+var DIM_SUFFIX = "dim";
+
+function get_simple_key(chord_ish) {
+  var quality = "m";
+  if (module.exports.chord_is_major(chord_ish)) {
+    quality = "M";
+  }
+
+  return module.exports.get_chord_key(chord_ish) + quality;
+}
+
 function get_flavored_key(chord_ish, flavor) {
   if (typeof(chord_ish) === "string") {
     chord_ish = teoria.chord(chord_ish);
@@ -12,17 +26,17 @@ function get_flavored_key(chord_ish, flavor) {
   if (chord_ish.root) {
     if (!flavor) {
       var quality = chord_ish.quality();
-      flavor = "M";
+      flavor = MAJ_SUFFIX;
       if (quality === "minor") {
-        flavor = "m";
+        flavor = MIN_SUFFIX;
       }
 
       if (quality === "diminished") {
-        flavor = "d";
+        flavor = DIM_SUFFIX;
       }
 
       if (quality === "dominant") {
-        flavor = "D";
+        flavor = DOM_SUFFIX;
       }
     }
 
@@ -315,7 +329,7 @@ module.exports = {
   check_progression_grammar: check_progression_grammar,
   chord_is_major: function(chord_ish) {
     var name = module.exports.get_flavored_key(chord_ish);
-    if (name.match("M")) {
+    if (name.match("M") || name.match(DOM_SUFFIX)) {
       return true;
     }
   },
@@ -374,6 +388,7 @@ module.exports = {
 
   },
   get_progression_breaks: get_progression_breaks,
-  get_progression_candidate_chords: get_progression_candidate_chords
+  get_progression_candidate_chords: get_progression_candidate_chords,
+  get_simple_key: get_simple_key
 };
 

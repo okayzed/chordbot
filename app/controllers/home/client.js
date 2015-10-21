@@ -34,7 +34,7 @@ function clean_line(line) {
 }
 
 function get_chord_classname(chord) {
-  return get_chord_name(chord).replace("#", "s");
+  return analysis.get_simple_key(chord).replace("#", "s");
 }
 
 function get_chord_name(chord) {
@@ -83,7 +83,6 @@ module.exports = {
     var line = clean_line($("textarea").val());
 
     var progression = SELECTED_PROGRESSION;
-    console.log("PROG", progression, "CHORD", SELECTED_CHORD);
 
     if (OPENED == SELECTED_CHORD) {
       wipe_els($(".hist_row, .hist_key"));
@@ -99,7 +98,7 @@ module.exports = {
   open_histogram: function(progression) {
     
     var closehistEl = $(".close_hist");
-    closehistEl.text("close");
+    closehistEl.html("<span class='glyphicon glyphicon-minus' />");
 
     wipe_els($(".hist_row, .hist_key"));
     module.exports.highlight_cells(progression, SELECTED_CHORD_INDEX);
@@ -108,8 +107,7 @@ module.exports = {
   close_histogram: function() {
     OPENED = false;
     var closehistEl = $(".close_hist");
-    closehistEl.text("mods");
-
+    closehistEl.html("<span class='glyphicon glyphicon-search' />");
   },
 
   build_histogram_for_progression: function(progression) {
@@ -162,6 +160,7 @@ module.exports = {
       var rowEl = $("<div class='clearfix' />");
       rowEl.addClass("hist_row");
       rowEl.addClass("key_" + get_chord_classname(key));
+      key = analysis.get_simple_key(key);
 
       if ($(".key_" + get_chord_classname(key)).length) {
         return;
@@ -227,8 +226,6 @@ module.exports = {
     controlsEl.removeClass("hidden");
     var keySelect = controlsEl.find(".key_selector");
     keySelect.empty();
-    console.log(keySelect);
-    console.log(progression);
 
     _.each(progressions, function(prog) {
       var optionEl = $("<option > </option>");
@@ -317,7 +314,14 @@ module.exports = {
         $(".hover").removeClass("hover");
         $(this).addClass("hover");
         var closehistEl = $(".close_hist");
-        closehistEl.html("mods");
+        closehistEl.html("<span class='glyphicon glyphicon-search' />");
+
+        if (SELECTED_CHORD !== chord) {
+          closehistEl.fadeOut(function() {
+            closehistEl.fadeIn();
+          });
+        }
+
         SELECTED_CHORD = progression.chord_list[index];
         SELECTED_CHORD_INDEX = index;
         bootloader.require("app/client/synth", function(synth) {
@@ -353,7 +357,7 @@ module.exports = {
 
     // For any given chord, we find it's relative modulations...
     // and we find the modulations based on current key / destination key
-    var relatives = relative_modulations[analysis.get_flavored_key(chord)];
+    var relatives = relative_modulations[analysis.get_simple_key(chord)];
 
     // For available...
     var available = [
@@ -363,7 +367,7 @@ module.exports = {
     ];
 
     _.each(common_chord_modulations[current_key + "M"], function(chords, dest_key) {
-      var chord_key = analysis.get_flavored_key(chord);
+      var chord_key = analysis.get_simple_key(chord);
       if (chords[chord_key]) {
         available.push([dest_key, get_chord_name(chord_key), chords[chord_key]]);
       }
@@ -374,9 +378,8 @@ module.exports = {
       chordEl.addClass("relative");
     });
 
-    var chord_key = analysis.get_flavored_key(chord);
+    var chord_key = analysis.get_simple_key(chord);
     var keys_with_chord = bootloader.require("app/client/grammar").KEYS_WITH_CHORD[chord_key];
-    console.log("KEYS WITH CHORD", keys_with_chord);
     _.each(keys_with_chord, function(interval, dest_key) {
         available.push([analysis.get_flavored_key(dest_key), chord_key, []]);
     });
@@ -573,8 +576,6 @@ module.exports = {
       if (progression) {
         return;
       }
-
-      console.log("KEY", key, p.key);
 
       if (key === p.key) {
         progression = p;

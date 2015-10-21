@@ -7,7 +7,7 @@ var cached_determineds = {};
 module.exports = {
   get_chord_for_function: function(func, root) {
     var acc = -1;
-    var chord_name = "???";
+    var chord_name;
     bootloader.js(["app/client/grammar", "app/client/analysis"], function() {
       var grammar = bootloader.require("app/client/grammar");
       var analysis = bootloader.require("app/client/analysis");
@@ -32,7 +32,10 @@ module.exports = {
       var chord_key = analysis.get_flavored_key(root);
       var simple_key = analysis.get_chord_key(root);
 
-      chord_name = grammar.FUNCTIONS_FOR_KEY[chord_key][func];
+      if (grammar.FUNCTIONS_FOR_KEY[chord_key]) {
+        chord_name = grammar.FUNCTIONS_FOR_KEY[chord_key][func];
+      }
+
       if (!chord_name) {
         chord_name = grammar.FUNCTIONS_FOR_KEY[simple_key][func];
       }
