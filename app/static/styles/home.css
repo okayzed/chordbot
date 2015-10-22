@@ -56,8 +56,17 @@ body {
     font-size: 50%;
   }
 
-  &.hover {
+  .mods {
+    opacity: 0;
+  }
+
+  &.hover,
+  &:hover {
     background-color: #ddd;
+
+    .mods {
+      opacity: 1;
+    }
   }
 
   &.miss {

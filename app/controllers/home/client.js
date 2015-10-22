@@ -382,8 +382,19 @@ module.exports = {
       chordLabel.html(progression.labeling[index] + "<br /> <span class=''>" + get_chord_name(current_key) + "</span>");
 
       chordEl.text(progression.chord_list[index] + " (" + get_chord_name(progression.chord_list[index]) + ")");
+
+      var modEl = $("<a class='rfloat mods col-md-4 col-xs-3'>where can you go?</a>");
+      modEl.css("font-size", "14px");
+      modEl.on("click", function() {
+        SELECTED_CHORD_INDEX = index;
+        SELECTED_CHORD = progression.chord_list[index];
+        OPENED = SELECTED_CHORD;
+        module.exports.highlight_cells(progression, index);
+      });
+
       chordEl.append($("<div class='clearfix'/>"));
       chordEl.append(chordLabel);
+      chordEl.append(modEl);
 
       if (progression.mod_labeling[index] !== progression.labeling[index]) {
         var modLabel = $("<div class='mod_label'/>");
@@ -403,7 +414,12 @@ module.exports = {
         $(".hover").removeClass("hover");
         $(this).addClass("hover");
         var closehistEl = $(".close_hist");
-        closehistEl.html("<span>mods</span>");
+        if (OPENED) {
+          closehistEl.html("<span>close</span>");
+        } else {
+          closehistEl.html("<span>mods</span>");
+
+        }
 
         if (get_chord_name(SELECTED_CHORD) !== get_chord_name(chord)) {
           closehistEl.fadeOut(function() {
