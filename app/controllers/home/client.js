@@ -41,7 +41,7 @@ function get_chord_name(chord) {
   try {
     var chord_name = analysis.get_flavored_key(chord);
     chord_name = chord_name[0].toUpperCase() + chord_name.slice(1);
-    return chord_name.replace("dom", "D").replace("dim", "d");
+    return chord_name.replace("dom", "7").replace("dim", "d").replace("M", "");
   } catch(e) {
     return chord;
   }
@@ -238,7 +238,6 @@ module.exports = {
     _.each(progressions, function(prog) {
       var optionEl = $("<option > </option>");
       var chord_key = get_chord_name(prog.key);
-      chord_key = chord_key.slice(0, chord_key.length - 1);
 
       optionEl.html(chord_key);
       optionEl.attr('value', prog.key);
@@ -383,7 +382,7 @@ module.exports = {
 
       chordEl.text(progression.chord_list[index] + " (" + get_chord_name(progression.chord_list[index]) + ")");
 
-      var modEl = $("<a class='rfloat mods col-md-4 col-xs-3'>where can you go?</a>");
+      var modEl = $("<a class='rfloat mods col-md-4 col-xs-6'>what next?</a>");
       modEl.css("font-size", "14px");
       modEl.on("click", function() {
         SELECTED_CHORD_INDEX = index;
