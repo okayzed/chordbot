@@ -257,7 +257,7 @@ module.exports = {
     var likeEl = controlsEl.find(".likeliness_ratio");
     likeEl.css("line-height", "2em");
     if (likeliness_ratio > 150) {
-      likeEl.css("border", "5px solid #15d115");
+      likeEl.css("border-bottom", "5px solid #15d115");
       likeEl.html("great fit");
 
     } else if (likeliness_ratio > 100) {
@@ -295,6 +295,57 @@ module.exports = {
     controlsEl.find(".grammar_breaks").html(breaks);
     controlsEl.find(".current_key").html(progression.key);
 
+
+  },
+
+  build_bars_for_progression: function(progression) {
+    var parentEl = $("<div class='col-md-12' />");
+    var histograms = analysis.get_chord_histograms(progression);
+
+    // should sort by the circle of fifths, probably
+    var keys = _.keys(histograms.weighted);
+    var total = 0;
+    var max = 0;
+    _.each(histograms.weighted.direct.raw, function(count, key) {
+      total += count;
+      max = Math.max(max, count);
+    });
+
+    function build_hist_el(count, key) {
+
+      var histEl = $("<span> </span>");
+      histEl.addClass("pam");
+      var height_ratio = parseInt(count / max * 100, 10);
+      histEl.css({
+        "background-color": "#babdb6",
+        "display": "inline-block",
+        "margin-right": "10px",
+        "margin-bottom" : "5px",
+        "width": "40px",
+        "height": parseInt(height_ratio * 50 / 100.0, 10) + "px"
+      });
+
+      histEl.html(key);
+      return histEl;
+    }
+
+    var chordParent = $("<div class='col-md-6'> </div>");
+    chordParent.append("<h2 class='clearfix'>chords</h2>");
+    _.each(histograms.weighted.direct.raw, function(count, key) {
+      var histEl = build_hist_el(count, key);
+      chordParent.append(histEl);
+    });
+    parentEl.append(chordParent);
+
+    chordParent = $("<div class='col-md-6'> </div>");
+    chordParent.append("<h2 class='clearfix'>implied chords</h2>");
+    _.each(histograms.weighted.implied.raw, function(count, key) {
+      var histEl = build_hist_el(count, key);
+      histEl.css("opacity", 0.5);
+      chordParent.append(histEl);
+    });
+    parentEl.append(chordParent);
+    return parentEl;
 
   },
 
@@ -529,6 +580,10 @@ module.exports = {
     SELECTED_PROGRESSION = prog;
     self.labelings[line] = sorted_progressions;
 
+    var barEl = module.exports.build_bars_for_progression(prog);
+    self.$el.find(".progression_info .histogram").empty();
+    self.$el.find(".progression_info .histogram").append(barEl);
+
     var uiEl = module.exports.build_ui_for_progression(prog);
     self.$el.find(".progression").append(uiEl);
 
@@ -539,7 +594,7 @@ module.exports = {
       prog.variations = generator.get_possible_variations(prog);
 
       var histEl = module.exports.build_histogram_for_progression(prog);
-      self.$el.find(".histogram").append(histEl);
+      self.$el.find(".modulation_table").append(histEl);
       
     }, 100);
 
@@ -560,7 +615,7 @@ module.exports = {
     $(".loading").show();
     module.exports.old_val = val;
 
-    $(".progression, .histogram").empty();
+    $(".progression, .modulation_table").empty();
   
     var self = this;
     setTimeout(function() {
@@ -620,11 +675,11 @@ module.exports = {
     SELECTED_KEY = key;
     SELECTED_PROGRESSION = progression;
 
-    this.$el.find(".histogram").empty();
+    this.$el.find(".modulation_table").empty();
     this.$el.find(".progression").empty();
 
     var histEl = this.build_histogram_for_progression(progression);
-    this.$el.find(".histogram").append(histEl);
+    this.$el.find(".modulation_table").append(histEl);
 
     var uiEl = module.exports.build_ui_for_progression(progression);
     this.$el.find(".progression").append(uiEl);
