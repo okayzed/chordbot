@@ -51,6 +51,10 @@ module.exports = {
         chord_name = grammar.FUNCTIONS_FOR_KEY[simple_key][func];
       }
 
+      if (chord_name) {
+        chord_name = analysis.get_flavored_key(chord_name, quality);
+      }
+
       // maybe we try one more time, but inverting values...
       if (!chord_name) {
         func = func.toUpperCase();
@@ -60,19 +64,19 @@ module.exports = {
         }
 
         if (chord_name) {
-          chord_name = analysis.get_flavored_key(chord_name, "m");
+          chord_name = analysis.get_flavored_key(chord_name, quality || "m");
         }
       } 
 
       if (!chord_name) {
         func = func.toLowerCase();
-        chord_name = grammar.FUNCTIONS_FOR_KEY[simple_key][func];
+        chord_name = grammar.FUNCTIONS_FOR_KEY[chord_key][func];
         if (!chord_name) {
-          chord_name = grammar.FUNCTIONS_FOR_KEY[chord_key][func];
+          chord_name = grammar.FUNCTIONS_FOR_KEY[simple_key][func];
         }
 
         if (chord_name) {
-          chord_name = analysis.get_flavored_key(chord_name, "M");
+          chord_name = analysis.get_flavored_key(chord_name, quality || "M");
         }
 
       }
