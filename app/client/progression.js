@@ -162,14 +162,17 @@ module.exports = {
       "dominant" : "7",
       "diminished" : "dim",
       "minor" : "m",
-      "augmented" : "+"
+      "augmented" : "+",
+      "suspended" : "sus"
     };
 
 
     var small_quality = lookup[chord.quality()];
     var labeling = prog_name;
     if (small_quality !== desired_quality) {
-      prog_name += small_quality;
+      if (small_quality) {
+        prog_name += small_quality;
+      }
     }
 
     if (interval.quality() == "m") {

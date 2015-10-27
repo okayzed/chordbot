@@ -429,7 +429,12 @@ module.exports = {
         SELECTED_CHORD = progression.chord_list[index];
         SELECTED_CHORD_INDEX = index;
         bootloader.require("app/client/synth", function(synth) {
-          synth.play_chord(analysis.get_flavored_key(progression.chord_list[index]));
+          try {
+            synth.play_chord(progression.chord_list[index]);
+          } catch(e) {
+            console.log("CANT PLAY CHORD", e, progression.chord_list[index]);
+            synth.play_chord(analysis.get_flavored_key(progression.chord_list[index]));
+          }
         });
       });
 
@@ -656,7 +661,7 @@ module.exports = {
       var duration = 1000;
 
       bootloader.require("app/client/synth", function(synth) {
-        synth.play_chord(get_chord_name(lines[index]), duration);
+        synth.play_chord(lines[index], duration);
         $(".chord").removeClass("playing");
         $($(".chord").get(index)).addClass("playing");
         index += 1;

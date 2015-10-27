@@ -14,22 +14,54 @@
 %>
 
 <div class="container" style="margin: auto; margin-top: 10px; padding-bottom: 200px">
-  <div class='not_that_helpful_info collapse'>
+  <div class='not_that_helpful_info collapse clearfix'>
     <h1>what next? <small><a href='#' data-toggle='collapse' data-target='.not_that_helpful_info'>close</a></small></h1> 
 
-    <p>
-    <b>chord bot</b> (imprisoned below)  is a song-writer's mediocre friend. an
-    acquaintance, really. he listens to your chord progressions and then gives
-    helpful (and unhelpful) advice. and maybe goes on for a bit too long.
-    </p>
+    <div class='col-md-6'>
+      <p>
+      <b>chord bot</b> (imprisoned below)  is a song-writer's mediocre friend. an
+      acquaintance, really. he listens to your chord progressions and then gives
+      helpful (and unhelpful) advice. and maybe goes on for a bit too long.
+      </p>
 
+      <p>
+      chord bot uses <b>chord grammars</b> to guess the labeling (I, ii, IV, etc)
+      of the chords its been eating. </p>
+      
+      <p>A chord grammar looks like <b style='font-family: monospace'>iii | vi |
+      IV ii | V vii | I</b> and shows what chords will sound good after each
+      other. You start from the <b>I</b> and can go to any chord. From there, you travel
+      rightwards back to the <b>I</b>. Using this line, it's easy to generate
+      endless progressions that sound pleasant against each other.
+      </p>
+      <p>once chord bot has digested the chords, clicking "what next" on a
+      chord will open the <b>modulations table</b>. </p>
+
+
+    </div>
+   
+    <div class='col-md-5'>
     <p>
-    chord bot uses <b>chord grammars</b> to guess the labeling (I, ii, IV, etc)
-    of the chords its been eating. once digested, chord bot will then give
-    recommendations on where to move the song from a selected chord. using the
-    modulations table, chord bot gauges the effect of different chords on the
-    overall 'feeling' of the song. unfortunately, he can't talk - only sing.
-    </p>
+      <b>The modulation table</b> shows
+      all keys that contain that chord and their constituent chords (arranged
+      by grammatical function). </p>
+
+      <p >A green cell is a chord that works in the grammar of
+      the current key and the destination key.  This chord will be 'neutral'
+      towards the overall feeling of the tonic.
+      </p>
+
+      <p >
+      A blue cell is a chord that exists in both keys, but is only grammatical
+      in the destination key This chord will flavor the key of the song towards
+      the new chord, but sound pleasant in both keys.
+      </p>
+
+      <p >
+      An unhighlighted cell exists only in the destination key. Using one of
+      these will cause a more abrupt modulation.
+      </p>
+    </div>
 
   </div>
   <form class='form' style='margin-top: 20px'>
