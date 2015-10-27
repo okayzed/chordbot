@@ -8,6 +8,7 @@ var MIN_SUFFIX = "m";
 var MAJ_SUFFIX = "M";
 var DOM_SUFFIX = "dom";
 var DIM_SUFFIX = "dim";
+var AUG_SUFFIX = "+";
 
 function get_simple_key(chord_ish) {
   var quality = "m";
@@ -37,6 +38,10 @@ function get_flavored_key(chord_ish, flavor) {
 
       if (quality === "dominant") {
         flavor = DOM_SUFFIX;
+      }
+
+      if (quality === "augmented") {
+        flavor = AUG_SUFFIX;
       }
     }
 

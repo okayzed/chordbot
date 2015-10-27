@@ -161,7 +161,8 @@ module.exports = {
       "major" : "M",
       "dominant" : "7",
       "diminished" : "dim",
-      "minor" : "m"
+      "minor" : "m",
+      "augmented" : "+"
     };
 
 
