@@ -23,7 +23,6 @@ var generator = require("app/client/generator");
 var BARS_PER_LINE = 8;
 var LAST_SELECTED_INDEX;
 
-var SELECTED_KEY;
 var SELECTED_PROGRESSION;
 var SELECTED_CHORD;
 var SELECTED_CHORD_INDEX;
@@ -590,13 +589,6 @@ module.exports = {
 
     self.progressions[line] = prog;
 
-    // revert to SELECTED one by UI
-    if (SELECTED_KEY) {
-      prog = _.find(sorted_progressions, function(p) {
-        return p.key === SELECTED_KEY;
-      });
-    }
-
     SELECTED_PROGRESSION = prog;
     self.labelings[line] = sorted_progressions;
 
@@ -692,7 +684,6 @@ module.exports = {
       progression.variations = generator.get_possible_variations(progression);
     }
 
-    SELECTED_KEY = key;
     SELECTED_PROGRESSION = progression;
 
     this.$el.find(".modulation_table").empty();
