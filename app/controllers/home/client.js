@@ -108,6 +108,7 @@ module.exports = {
 
     $(".hist_control").removeClass("active");
     $(".hist_control.mods").addClass("active");
+    $(".modulation_table").addClass("opened");
 
 
     wipe_els($(".hist_row, .hist_key, .hist_controls"));
@@ -120,6 +121,8 @@ module.exports = {
     var closehistEl = $(".close_hist");
     closehistEl.html("<span class=''>mods</span>");
     $(".modulation_controls").slideUp();
+    $(".modulation_table").removeClass("opened");
+    module.exports.show_original();
   },
 
   build_modulation_for_progression: function(progression) {
@@ -787,8 +790,9 @@ module.exports = {
     // from Major, we can pull bIII, bVI or bVII (is bVII really a thing?)
     var rows = $(".hist_row");
     var substitutions = {
+      "Im" : "I",
       "I" : "Im",
-      "ii" : "iidim",
+      "ii" : "biiM",
       "IV" : "iv",
       "iii" : "biiiM",
       "vi" : "bviM",
@@ -843,7 +847,18 @@ module.exports = {
     }
 
   },
+
+  // IF THE HISTOGRAM IS OPEN AND WE AREN"T TYPING IN THE TEXTBOX...
+  handle_keyup: function(e) {
+    // "0" = 48?
+
+  },
+  handle_keydown: function(e) {
+    // "0" = 48?
+  },
   events: {
+    "keydown" : "handle_keydown",
+    "keyup" : "handle_keydown",
     "keydown textarea" : "analyze_chords",
     "click .analyze" : "analyze_chords",
     "click .play" : "play_chords",

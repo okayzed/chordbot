@@ -97,6 +97,7 @@ module.exports = {
         }
 
         acc += delta;
+        var orig_name = chord_name;
 
         var chord = teoria.chord(chord_name);
         var chord_quality = quality || "M";
@@ -110,25 +111,22 @@ module.exports = {
           chord_name = analysis.get_chord_key(chord_name) + "#" + chord_quality;
         }
 
-        chord_name = chord_name.replace(/#b/, '');
-
-        if (chord_name.indexOf("bb") !== -1) {
+        if (chord_name.indexOf("bb") > 0) {
+          var chord_note = teoria.note(analysis.get_chord_key(chord_name));
+          chord_note.transpose(teoria.interval("M7"));
+          chord_name = analysis.get_chord_key(teoria.chord(chord_note.name())) + chord_quality;
+        } else if (chord_name.indexOf("##") !== -1) {
           var chord_note = teoria.note(analysis.get_chord_key(chord_name));
           chord_note.transpose(teoria.interval("M2"));
-          chord_name = analysis.get_chord_key(teoria.chord(chord_note)) + chord_quality;
-        } else if (chord_name.indexOf("xx") !== -1) {
-          var chord_note = teoria.note(analysis.get_chord_key(chord_name));
-          chord_note.transpose(teoria.interval("-M2"));
-          chord_name = analysis.get_chord_key(teoria.chord(chord_note)) + chord_quality;
+          chord_name = analysis.get_chord_key(teoria.chord(chord_note.name())) + chord_quality;
 
         }
+        chord_name = chord_name.replace(/#b/, '');
 
       }
 
 
     });
-
-    chord_name = chord_name.replace(/#b/, '');
 
     return chord_name;
 
