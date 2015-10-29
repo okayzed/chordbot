@@ -209,6 +209,8 @@ function check_progression_grammar(labeling) {
 
         if (prev_in_major_grammar && in_major_grammar) {
           if (check_grammar(prev_chord, chord, grammar.matrix)) {
+            // TODO: whenever there is a diatonic break, can we patch it up
+            // with some chromaticisms?
             issues[index] = 'break';
           }
         }

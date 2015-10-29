@@ -91,7 +91,7 @@ module.exports = {
     var progression = SELECTED_PROGRESSION;
 
     if (OPENED == SELECTED_CHORD) {
-      wipe_els($(".hist_row, .hist_key"));
+      wipe_els($(".hist_row, .hist_key, .hist_controls"));
       module.exports.close_histogram();
     } else {
       OPENED = SELECTED_CHORD;
@@ -101,22 +101,28 @@ module.exports = {
 
   },
 
-  open_histogram: function(progression) {
-    
+  open_histogram: function(progression, index) {
+   
     var closehistEl = $(".close_hist");
     closehistEl.html("<span class='' />close</span>");
 
-    wipe_els($(".hist_row, .hist_key"));
-    module.exports.highlight_cells(progression, SELECTED_CHORD_INDEX);
+    $(".hist_control").removeClass("active");
+    $(".hist_control.mods").addClass("active");
+
+
+    wipe_els($(".hist_row, .hist_key, .hist_controls"));
+    $(".modulation_controls").removeClass("hidden").slideDown();
+    module.exports.highlight_cells(progression, index || SELECTED_CHORD_INDEX);
 
   },
   close_histogram: function() {
     OPENED = false;
     var closehistEl = $(".close_hist");
     closehistEl.html("<span class=''>mods</span>");
+    $(".modulation_controls").slideUp();
   },
 
-  build_histogram_for_progression: function(progression) {
+  build_modulation_for_progression: function(progression) {
     var histograms = analysis.get_chord_histograms(progression);
     console.log("WEIGHTED HISTOGRAM", histograms.weighted);
     console.log("UNWEIGHTED ", histograms.unweighted);
@@ -167,6 +173,7 @@ module.exports = {
       var rowEl = $("<div class='clearfix' />");
       rowEl.addClass("hist_row");
       rowEl.addClass("key_" + get_chord_classname(key));
+      rowEl.attr("data-key", key);
       key = analysis.get_simple_key(key);
 
       if ($(".key_" + get_chord_classname(key)).length) {
@@ -209,6 +216,8 @@ module.exports = {
         }
 
         el.html(get_chord_name(chord));
+        el.attr("data-chord", chord);
+        el.attr("data-chord_name", get_chord_name(chord));
 
         return el;
       });
@@ -387,7 +396,7 @@ module.exports = {
         SELECTED_CHORD_INDEX = index;
         SELECTED_CHORD = progression.chord_list[index];
         OPENED = SELECTED_CHORD;
-        module.exports.highlight_cells(progression, index);
+        module.exports.open_histogram(progression, index);
       });
 
       chordEl.append($("<div class='clearfix'/>"));
@@ -447,6 +456,10 @@ module.exports = {
 
   highlight_cells: function(progression, index) {
     LAST_SELECTED_INDEX = index + 1;
+    if (!OPENED) {
+      module.exports.open_histogram();
+    }
+
     var current_key = progression.modulations[index] || progression.key;
     var chord = progression.chord_list[index];
     var relative_modulations = progression.variations.relative;
@@ -605,8 +618,8 @@ module.exports = {
       console.log("FINDING MODULATION OPPORTUNITIES");
       prog.variations = generator.get_possible_variations(prog);
 
-      var histEl = module.exports.build_histogram_for_progression(prog);
-      self.$el.find(".modulation_table").append(histEl);
+      var histEl = module.exports.build_modulation_for_progression(prog);
+      self.$el.find(".modulation_table .mod_table").append(histEl);
       
     }, 100);
 
@@ -627,7 +640,8 @@ module.exports = {
     $(".loading").show();
     module.exports.old_val = val;
 
-    $(".progression, .modulation_table").empty();
+    $(".progression, .modulation_table .mod_table").empty();
+    module.exports.close_histogram();
   
     var self = this;
     setTimeout(function() {
@@ -686,22 +700,156 @@ module.exports = {
 
     SELECTED_PROGRESSION = progression;
 
-    this.$el.find(".modulation_table").empty();
+    this.$el.find(".modulation_table .mod_table").empty();
     this.$el.find(".progression").empty();
 
-    var histEl = this.build_histogram_for_progression(progression);
-    this.$el.find(".modulation_table").append(histEl);
+    var histEl = this.build_modulation_for_progression(progression);
+    this.$el.find(".modulation_table .mod_table").append(histEl);
 
     var uiEl = module.exports.build_ui_for_progression(progression);
     this.$el.find(".progression").append(uiEl);
     this.set_controls_for_progression(progression, labelings);
+  },
+  show_original: function() {
+    var cells = $(".hist_key");
+    _.each(cells, function(cell) {
+      if ($(cell).hasClass("hist_head")) {
+        return;
+      }
+
+      var chord_name = $(cell).data("chord_name");
+
+      $(cell).html(chord_name);
+    });
+
+  },
+  show_inversions: function(index) {
+    var cells = $(".hist_key");
+    _.each(cells, function(cell) {
+      if ($(cell).hasClass("hist_head")) {
+        return;
+      }
+
+      var chord = $(cell).data("chord");
+      if (!chord) {
+        return;
+      }
+
+      var new_chord = teoria.chord(chord).simple();
+      var chord_name = get_chord_name(chord);
+
+      var new_root = new_chord[index || 1];
+
+      $(cell).html(chord_name + "/" + new_root);
+    });
+  },
+  show_alterations: function() {
+    var rows = $(".hist_row");
+    var substitutions = {
+      "V" : "V",
+      "ii": "biiM",
+      "I": "I",
+      "IV" : "IV"
+    };
+
+    var suffixations = {
+      "V" : "7b5",
+      "ii": "b5",
+      "IV" : "b3",
+      "I" : "b7"
+    };
+
+    _.each(rows, function(row) {
+      // ummm... this thingie...
+      var key = $(row).data("key");
+      $(row).find(".hist_key").addClass("unsubbed");
+      _.each(substitutions, function(use, sub) {
+        var to_sub = $(row).find(".func_" + sub);
+        var chord = to_sub.data("chord");
+        var sub_chord = Progression.get_chord_for_function(use, key);
+        if (!sub_chord) {
+          return;
+        }
+        // what is current key, though?
+        to_sub.html(get_chord_name(sub_chord) + (suffixations[sub] || ""));
+        to_sub.removeClass('unsubbed');
+      });
+
+      $(row).find(".hist_key.unsubbed").html("");
+
+    });
+    
+
+
+  },
+  show_substitutions: function() {
+    // modal mixture chords I know of...
+    // from Major, we can pull bIII, bVI or bVII (is bVII really a thing?)
+    var rows = $(".hist_row");
+    var substitutions = {
+      "I" : "Im",
+      "ii" : "iidim",
+      "IV" : "iv",
+      "iii" : "biiiM",
+      "vi" : "bviM",
+      "vii" : "bviiM"
+    };
+
+
+    _.each(rows, function(row) {
+      // ummm... this thingie...
+      var key = $(row).data("key");
+      $(row).find(".hist_key").addClass("unsubbed");
+      _.each(substitutions, function(use, sub) {
+        var to_sub = $(row).find(".func_" + sub);
+        var chord = to_sub.data("chord");
+        var sub_chord = Progression.get_chord_for_function(use, key);
+        if (!sub_chord) {
+          return;
+        }
+        // what is current key, though?
+        to_sub.html(get_chord_name(sub_chord));
+        to_sub.removeClass('unsubbed');
+      });
+
+      $(row).find(".hist_key.unsubbed").html("");
+
+    });
+    
+
+  },
+  update_modulation_table: function(e) {
+    var controlEl = $(e.target).closest(".hist_control");
+    $(".hist_control").removeClass("active");
+    controlEl.addClass("active");
+    if (controlEl.hasClass("mods")) {
+      module.exports.show_original();
+
+    }
+    if (controlEl.hasClass("invs")) {
+      module.exports.show_inversions();
+
+    }
+    if (controlEl.hasClass("sinvs")) {
+      module.exports.show_inversions(2);
+    }
+    if (controlEl.hasClass("subs")) {
+      module.exports.show_substitutions();
+
+    }
+    if (controlEl.hasClass("alts")) {
+      module.exports.show_alterations();
+
+    }
+
   },
   events: {
     "keydown textarea" : "analyze_chords",
     "click .analyze" : "analyze_chords",
     "click .play" : "play_chords",
     "click .hist_key" : "click_chord",
-    "change .key_selector" : "change_key"
+    "change .key_selector" : "change_key",
+    "click .modulation_controls" : "update_modulation_table"
   }
 
 

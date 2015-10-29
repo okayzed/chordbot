@@ -110,10 +110,25 @@ module.exports = {
           chord_name = analysis.get_chord_key(chord_name) + "#" + chord_quality;
         }
 
+        chord_name = chord_name.replace(/#b/, '');
+
+        if (chord_name.indexOf("bb") !== -1) {
+          var chord_note = teoria.note(analysis.get_chord_key(chord_name));
+          chord_note.transpose(teoria.interval("M2"));
+          chord_name = analysis.get_chord_key(teoria.chord(chord_note)) + chord_quality;
+        } else if (chord_name.indexOf("xx") !== -1) {
+          var chord_note = teoria.note(analysis.get_chord_key(chord_name));
+          chord_note.transpose(teoria.interval("-M2"));
+          chord_name = analysis.get_chord_key(teoria.chord(chord_note)) + chord_quality;
+
+        }
+
       }
 
 
     });
+
+    chord_name = chord_name.replace(/#b/, '');
 
     return chord_name;
 

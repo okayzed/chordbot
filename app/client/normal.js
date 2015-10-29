@@ -7,7 +7,9 @@ module.exports = {
       if (chord.indexOf("/") != -1) {
         var chords = chord.split("/");
         chord = chords[0];
-        chord = chord.replace(/d$/, "dim").replace(/D$/, "dom");
+        if (chord.length > 1) {
+          chord = chord.replace(/d$/, "dim").replace(/D$/, "dom");
+        }
         chord = chord + "/" + chords[1];
         return chord;
       }
