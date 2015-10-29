@@ -775,7 +775,7 @@ module.exports = {
         to_sub.removeClass('unsubbed');
       });
 
-      $(row).find(".hist_key.unsubbed").html("");
+      $(row).find(".hist_key.unsubbed").html("&nbsp;");
 
     });
     
@@ -812,7 +812,7 @@ module.exports = {
         to_sub.removeClass('unsubbed');
       });
 
-      $(row).find(".hist_key.unsubbed").html("");
+      $(row).find(".hist_key.unsubbed").html("&nbsp;");
 
     });
     

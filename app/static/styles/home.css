@@ -242,6 +242,7 @@ body {
   .hist_control {
     cursor: pointer;
     padding: 5px;
+    font-variant: small-caps;
 
     &:hover {
       background-color: #777;
@@ -249,27 +250,8 @@ body {
 
     &.active {
       font-weight: bold;
+      background-color: #aaa;
+      color: #333;
     }
   }
-}
-  
-/*  */
-/*  */
-/*   .rmin, */
-/*   .pmin { */
-/*     background-color: blue; */
-/*   } */
-/*    */
-/*   .pmaj, */
-/*   .rmaj { */
-/*     background-color: green; */
-/*   } */
-/*  */
-/*   .dom7 { */
-/*  */
-/*   } */
-/*  */
-/*   .res7 { */
-/*     background-color: yellow; */
-/*   } */
 }
