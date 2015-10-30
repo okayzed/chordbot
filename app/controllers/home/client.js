@@ -849,16 +849,30 @@ module.exports = {
   },
 
   // IF THE HISTOGRAM IS OPEN AND WE AREN"T TYPING IN THE TEXTBOX...
-  handle_keyup: function(e) {
-    // "0" = 48?
+  handle_keydown: _.throttle(function(e) {
+    switch(e.keyCode) {
+      case 48:
+        module.exports.show_original();
+        break;
+      case 49:
+        module.exports.show_inversions();
+        break;
+      case 50:
+        module.exports.show_inversions(2);
+        break;
+      case 51:
+        module.exports.show_substitutions();
+        break;
+      case 52:
+        module.exports.show_alterations();
+        break;
+    }
 
-  },
-  handle_keydown: function(e) {
+
     // "0" = 48?
-  },
+  }, 200),
   events: {
     "keydown" : "handle_keydown",
-    "keyup" : "handle_keydown",
     "keydown textarea" : "analyze_chords",
     "click .analyze" : "analyze_chords",
     "click .play" : "play_chords",
