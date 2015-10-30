@@ -1,0 +1,28 @@
+<% 
+
+  var examples = [
+    "AM D AM D F G A",
+    "Gm E Gm E",
+    "Dm GM CM AM Dm G7 CM Dm E7",
+    "Ab Db Ab Db Fb Gb Ab",
+    "G Em G Em G Bm Am D G Em Bm G ",
+    "G D G Bm C D G C G Bm Am D G Em Bm Em G F D",
+    "D D D D D D am7 D7/A G G D bm D A7 D "
+  ];
+%>
+
+
+  <form class='form' style='margin-top: 20px'>
+    <textarea class='form-control' style='width: 100%'><%= examples[_.random(examples.length-1)] %></textarea>
+  </form>
+
+  <div class='mtl btn btn-default analyze' style='font-family: monospace; width: 50%;'>
+    FEED CHORD BOT
+  </div>
+  <div class='mtl btn btn-default play rfloat mbl' style='font-family: monospace; width: 24%;'>
+    PLAY
+  </div>
+  <div class='mtl btn btn-default rfloat mbl' style='font-family: monospace; width: 24%;' data-toggle="collapse" data-target=".not_that_helpful_info">
+    WHAT NEXT?
+  </div>
+
