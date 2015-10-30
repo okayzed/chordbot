@@ -26,16 +26,15 @@ module.exports = {
     }
     duration = duration || 1000;
 
-    var chord_notes = _.shuffle(teoria_chord.notes());
-    _.each(chord_notes, function(note, index) {
-      var midi = note.midi();
-      for (var i = 0; i < 4; i++ ){
+    // octaves cost 12. so... the offsets will be...
+    var offsets = [-24, -12, 0, 0, 12];
 
-        setTimeout(function() { 
-          synth.noteOff(midi);
-          synth.noteOn(midi, 20);
-        }, Math.min(i * 50, duration) - 50);
-      }
+    var chord_notes = teoria_chord.notes();
+    chord_notes.push(chord_notes[0]);
+    _.each(chord_notes, function(note, index) {
+      var midi = note.midi() + offsets[index];
+
+      synth.noteOn(midi, 20);
 
       setTimeout(function() {
         synth.noteOff(midi);
