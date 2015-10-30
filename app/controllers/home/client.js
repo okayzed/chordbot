@@ -714,6 +714,9 @@ module.exports = {
     this.set_controls_for_progression(progression, labelings);
   },
   show_original: function() {
+    $(".hist_control").removeClass("active");
+    $(".hist_control.mods").addClass("active");
+
     var cells = $(".hist_key");
     _.each(cells, function(cell) {
       if ($(cell).hasClass("hist_head")) {
@@ -727,6 +730,12 @@ module.exports = {
 
   },
   show_inversions: function(index) {
+    $(".hist_control").removeClass("active");
+    if (index > 1) {
+      $(".hist_control.sinvs").addClass("active");
+    } else {
+      $(".hist_control.invs").addClass("active");
+    }
     var cells = $(".hist_key");
     _.each(cells, function(cell) {
       if ($(cell).hasClass("hist_head")) {
@@ -747,6 +756,9 @@ module.exports = {
     });
   },
   show_alterations: function() {
+    $(".hist_control").removeClass("active");
+    $(".hist_control.alts").addClass("active");
+
     var rows = $(".hist_row");
     var substitutions = {
       "V" : "V",
@@ -786,6 +798,9 @@ module.exports = {
 
   },
   show_substitutions: function() {
+    $(".hist_control").removeClass("active");
+    $(".hist_control.subs").addClass("active");
+
     // modal mixture chords I know of...
     // from Major, we can pull bIII, bVI or bVII (is bVII really a thing?)
     var rows = $(".hist_row");
@@ -851,6 +866,7 @@ module.exports = {
   // IF THE HISTOGRAM IS OPEN AND WE AREN"T TYPING IN THE TEXTBOX...
   handle_keydown: _.throttle(function(e) {
     switch(e.keyCode) {
+      case 192:
       case 48:
         module.exports.show_original();
         break;
@@ -861,10 +877,10 @@ module.exports = {
         module.exports.show_inversions(2);
         break;
       case 51:
-        module.exports.show_substitutions();
+        module.exports.show_alterations();
         break;
       case 52:
-        module.exports.show_alterations();
+        module.exports.show_substitutions();
         break;
     }
 
