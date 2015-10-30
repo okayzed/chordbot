@@ -757,9 +757,9 @@ module.exports = {
 
     var suffixations = {
       "V" : "7b5",
-      "ii": "b5",
-      "IV" : "b3",
-      "I" : "b7"
+      "ii": "Mb5",
+      "IV" : "Mb3",
+      "I" : "Mb7"
     };
 
     _.each(rows, function(row) {
