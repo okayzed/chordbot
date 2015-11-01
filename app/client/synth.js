@@ -27,7 +27,7 @@ module.exports = {
     duration = duration || 1000;
 
     // octaves cost 12. so... the offsets will be...
-    var offsets = [-24, -12, 0, 0, 12];
+    var offsets = [-24, -12, 0, 0, 0];
 
     var chord_notes = teoria_chord.notes();
     chord_notes.push(chord_notes[0]);

@@ -66,6 +66,18 @@ function get_chords_from_str(str) {
   return  chord_list;
 }
 
+function invert_chord(chord, index) {
+
+
+      var new_chord = teoria.chord(chord).simple();
+      var chord_name = get_chord_name(chord);
+
+      var new_root = new_chord[index || 1];
+      var inversion = chord_name + "/" + new_root;
+      return inversion;
+
+}
+
 
 var OPENED = false;
 function wipe_els(els) {
@@ -747,31 +759,44 @@ module.exports = {
         return;
       }
 
-      var new_chord = teoria.chord(chord).simple();
-      var chord_name = get_chord_name(chord);
+      var inversion = invert_chord(chord, index);
 
-      var new_root = new_chord[index || 1];
-
-      $(cell).html(chord_name + "/" + new_root);
+      $(cell).html(inversion);
     });
   },
-  show_alterations: function() {
+  show_secondary_mixtures: function() {
     $(".hist_control").removeClass("active");
     $(".hist_control.alts").addClass("active");
 
+
+    // Maybe we should implement the spellings for certain chords...
+    // neopolitan, and so on
+
     var rows = $(".hist_row");
     var substitutions = {
+      "Im" : "I",
+      "iv" : "IV",
+      "v" : "V",
+      "I" : "I",
+      "IV" : "IV",
       "V" : "V",
-      "ii": "biiM",
-      "I": "I",
-      "IV" : "IV"
+      "ii": "iiM",
+      "iii" : "iiiM",
+      "vi" : "viM",
+      "vii" : "viiM",
+      "III": "biiim",
+      "VI": "bvim"
     };
 
     var suffixations = {
-      "V" : "7b5",
-      "ii": "Mb5",
-      "IV" : "Mb3",
-      "I" : "Mb7"
+      "I" : "7",
+      "IV" : "7",
+      "V" : "7",
+      "Im" : "7",
+      "iv" : "7",
+      "v" : "7",
+
+
     };
 
     _.each(rows, function(row) {
@@ -797,7 +822,14 @@ module.exports = {
 
 
   },
-  show_substitutions: function() {
+  show_mixtures: function() {
+    var callbacks = {
+      "ii" : function(chord, new_chord) {
+        return invert_chord(new_chord);
+      }
+    };
+  },
+  show_simple_mixtures: function() {
     $(".hist_control").removeClass("active");
     $(".hist_control.subs").addClass("active");
 
@@ -808,10 +840,17 @@ module.exports = {
       "Im" : "I",
       "I" : "Im",
       "ii" : "biiM",
+      "III" : "iiiM",
+      "iv" : "IV",
+      "V" : "v",
       "IV" : "iv",
+      "VI" : "vim",
       "iii" : "biiiM",
       "vi" : "bviM",
       "vii" : "bviiM"
+    };
+
+    var callbacks = {
     };
 
 
@@ -826,8 +865,14 @@ module.exports = {
         if (!sub_chord) {
           return;
         }
-        // what is current key, though?
-        to_sub.html(get_chord_name(sub_chord));
+
+        if (callbacks[sub]) {
+          sub_chord = callbacks[sub](chord, get_chord_name(sub_chord));
+        } else {
+          sub_chord = get_chord_name(sub_chord);
+        }
+
+        to_sub.html(sub_chord);
         to_sub.removeClass('unsubbed');
       });
 
@@ -853,11 +898,11 @@ module.exports = {
       module.exports.show_inversions(2);
     }
     if (controlEl.hasClass("subs")) {
-      module.exports.show_substitutions();
+      module.exports.show_simple_mixtures();
 
     }
     if (controlEl.hasClass("alts")) {
-      module.exports.show_alterations();
+      module.exports.show_secondary_mixtures();
 
     }
 
@@ -877,10 +922,10 @@ module.exports = {
         module.exports.show_inversions(2);
         break;
       case 51:
-        module.exports.show_alterations();
+        module.exports.show_simple_mixtures();
         break;
       case 52:
-        module.exports.show_substitutions();
+        module.exports.show_secondary_mixtures();
         break;
     }
 
