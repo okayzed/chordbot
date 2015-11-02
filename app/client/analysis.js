@@ -186,8 +186,6 @@ _.each(['simple', 'secondary', 'double'], function(mixture_type) {
 });
 
 
-console.log("ALL LOOKUPS", ALL_LOOKUPS);
-
 // returns the original func this came from
 // and how many steps it took to get there
 var cached_labelings = {};
@@ -249,9 +247,10 @@ function get_progression_breaks(labeling) {
 function replace_mixtures(labeling) {
   var new_labeling = [];
   _.each(labeling, function(label) {
-    if (ALL_LOOKUPS[label]) {
+    var maj_label = label.replace("7", "M");
+    if (ALL_LOOKUPS[maj_label]) {
       // which label should we try?
-      var orig_funcs = ALL_LOOKUPS[label];
+      var orig_funcs = ALL_LOOKUPS[maj_label];
       new_labeling.push(orig_funcs[0].orig);
     } else {
       new_labeling.push(label);

@@ -792,12 +792,7 @@ module.exports = {
 
     var rows = $(".hist_row");
     var substitutions = {
-      "Im" : "I",
-      "iv" : "IV",
       "v" : "V",
-      "I" : "I",
-      "IV" : "IV",
-      "V" : "V",
       "ii": "iiM",
       "iii" : "iiiM",
       "vi" : "viM",
