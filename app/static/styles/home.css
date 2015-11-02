@@ -74,6 +74,24 @@ body {
 
   }
 
+  .mixture_simple {
+    border-left: 4px solid #f59500; 
+    padding-left: 4px;
+
+  }
+
+  .mixture_secondary {
+    border-left: 4px solid #ce5c00; 
+    padding-left: 4px;
+
+  }
+
+  .mixture_double {
+    border-left: 4px solid #f57900; 
+    padding-left: 4px;
+  }
+
+
   &.break {
     border-bottom: 2px solid #faa; 
   }

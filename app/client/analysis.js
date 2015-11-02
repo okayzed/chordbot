@@ -87,8 +87,6 @@ var MAJ_POINTS = {
     "ii": 1,
     "vii": 1,
     "vi": 1,
-    "bviM": 1,
-    "bviiM": 1,
     "V" : 1,
     "I" : 2,
     "sus" : -1,
@@ -107,9 +105,91 @@ var MIN_POINTS = {
     "b" : -1
 };
 
-var MAJ_KEYS = ["IV", "iii", "ii", "vii", "vi", "V", "I", "bviM", "bviiM", "b" ];
-var MIN_KEYS = ["vii", "Im", "ii", "III", "iv", "VI", "V", "b"];
+var MAJ_KEYS = ["IV", "iii", "ii", "vii", "vi", "V", "I" ];
+var MIN_KEYS = ["vii", "Im", "ii", "III", "iv", "VI", "V" ];
 
+var MIXTURES = {};
+
+var types = [ "simple", "secondary", "double" ];
+MIXTURES.simple = {
+  "Im" : "I",
+  "I" : "Im",
+  "ii" : "biiM",
+  "iv" : "IV",
+  "V" : "Vm",
+  "IV" : "IVm",
+  // changing root
+  "iii" : "biiiM",
+  "III" : "IIIm",
+  "vi" : "bviM",
+  "VI" : "vim",
+  "vii" : "bviiM"
+};
+
+MIXTURES.secondary = {
+  "ii": "iiM",
+  "iii" : "iiiM",
+  "vi" : "viM",
+  "vii" : "viiM",
+  "III": "biiim",
+  "VI": "bvim",
+  "VII" : "bviim"
+};
+
+MIXTURES.double = {
+  "ii" : "biim",
+  "iii" : "biiim",
+  "vi" : "bvim",
+  "vii" : "bviim",
+  "III" : "iiiM",
+  "VI" : "viM",
+  "VII" : "viiM"
+};
+
+var LOOKUPS = { };
+var ALL_LOOKUPS = {};
+LOOKUPS.original = {};
+
+_.each(MAJ_KEYS, function(key) {
+  LOOKUPS.original[key] = key;
+  if (!ALL_LOOKUPS[key]) { ALL_LOOKUPS[key] = []; }
+  ALL_LOOKUPS[key].push({
+    orig: key,
+    from: 'original'
+  });
+});
+
+_.each(MIN_KEYS, function(key) {
+  LOOKUPS.original[key] = key;
+  if (!ALL_LOOKUPS[key]) { ALL_LOOKUPS[key] = []; }
+  ALL_LOOKUPS[key].push({
+    orig: key,
+    from: 'original'
+  });
+});
+
+
+_.each(['simple', 'secondary', 'double'], function(mixture_type) {
+  var lookup = MIXTURES[mixture_type];
+  LOOKUPS[mixture_type] = {};
+  _.each(lookup, function(val, key) {
+    LOOKUPS[mixture_type][val] = key;
+    if (!ALL_LOOKUPS[val]) {
+      ALL_LOOKUPS[val] = [];
+    }
+
+    ALL_LOOKUPS[val].push({
+      orig: key,
+      from: mixture_type
+    });
+  });
+});
+
+
+console.log("ALL LOOKUPS", ALL_LOOKUPS);
+
+// returns the original func this came from
+// and how many steps it took to get there
 var cached_labelings = {};
 
 var cached_harmoniousness = {};
@@ -156,13 +236,45 @@ function get_progression_harmoniousness(labeling) {
 }
 
 function check_progression_grammar(labeling) {
+  labeling = replace_mixtures(labeling);
   return _.keys(grammar.check_progression_grammar(labeling)).length;
 
 }
 
 function get_progression_breaks(labeling) {
+  labeling = replace_mixtures(labeling);
   return grammar.check_progression_grammar(labeling);
+}
 
+function replace_mixtures(labeling) {
+  var new_labeling = [];
+  _.each(labeling, function(label) {
+    if (ALL_LOOKUPS[label]) {
+      // which label should we try?
+      var orig_funcs = ALL_LOOKUPS[label];
+      new_labeling.push(orig_funcs[0].orig);
+    } else {
+      new_labeling.push(label);
+    }
+
+  });
+
+  return new_labeling;
+}
+
+function find_mixtures(labeling) {
+  var issues = {};
+
+  _.each(labeling, function(label, index) {
+    if (ALL_LOOKUPS[label]) {
+      // which label should we try?
+      var orig_funcs = ALL_LOOKUPS[label];
+      issues[index] = orig_funcs[0].from;
+    }
+
+  });
+
+  return issues;
 }
 
 var likeliness_cache = {};
@@ -171,7 +283,7 @@ function decide_progression_likeliness(labeling) {
   var labeling_key = labeling.join(",");
 
   if (!likeliness_cache[labeling_key]) {
-    likeliness_cache[labeling_key] = get_progression_harmoniousness(labeling) - 
+    likeliness_cache[labeling_key] = get_progression_harmoniousness(labeling) -
       (2 * check_progression_grammar(labeling));
   }
 
@@ -204,7 +316,7 @@ function find_modulation_candidates(progression) {
       candidates[candidate_key] = decide_progression_likeliness(labelings[max_labeling]);
       likely_labelings[candidate_key] = max_labeling;
 
-    
+
     }
   }
 
@@ -260,7 +372,7 @@ module.exports = {
     });
 
     return labeled_chords;
-    
+
 
   },
   guess_progression_labelings: function(chord_list) {
@@ -297,7 +409,7 @@ module.exports = {
     });
 
     return ranked_labelings;
-  
+
   },
   get_possible_modulations: function(progression) {
 
@@ -321,6 +433,17 @@ module.exports = {
   decide_progression_likeliness: decide_progression_likeliness,
   get_progression_harmoniousness: get_progression_harmoniousness,
   check_progression_grammar: check_progression_grammar,
+  find_mixtures: find_mixtures,
+  replace_mixtures: replace_mixtures,
+  is_mixture: function(label) {
+    if (ALL_LOOKUPS[label]) {
+      if (ALL_LOOKUPS[label].from !== 'original') {
+        return true;
+      }
+    }
+
+    return false;
+  },
   chord_is_major: function(chord_ish) {
     var name = module.exports.get_flavored_key(chord_ish);
     if (name.match("M") || name.match(DOM_SUFFIX)) {

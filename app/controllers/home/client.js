@@ -272,6 +272,7 @@ module.exports = {
     });
 
     var breaks = analysis.check_progression_grammar(progression.labeling);
+
     var mod_breaks = analysis.check_progression_grammar(progression.mod_labeling);
 
     var likeliness_ratio = parseInt(progression.likeliness / progression.chord_list.length * 100, 10);
@@ -377,6 +378,8 @@ module.exports = {
     parentEl.append("<hr />");
     var progressionEl = $("<div class='clearfix' />");
     var grammar_breaks = analysis.get_progression_breaks(progression.labeling);
+    var chromaticisms = analysis.find_mixtures(progression.labeling);
+
     _.each(progression.chord_list, function(chord, index) {
       if (index && index % BARS_PER_LINE == 0) {
         parentEl.append(progressionEl);
@@ -414,12 +417,25 @@ module.exports = {
         module.exports.open_histogram(progression, index);
       });
 
+      // add something to the chromaticisms?
+      if (analysis.is_mixture(progression.labeling[index])) {
+        chordLabel.addClass("mixture_" + chromaticisms[index]);
+        chordLabel.attr('title', chromaticisms[index] + " mixture");
+
+      }
+
+
       chordEl.append($("<div class='clearfix'/>"));
       chordEl.append(chordLabel);
       chordEl.append(modEl);
 
       if (progression.mod_labeling[index] !== progression.labeling[index]) {
         var modLabel = $("<div class='mod_label'/>");
+        if (analysis.is_mixture(progression.mod_labeling[index])) {
+          modLabel.addClass("mixture_" + chromaticisms[index]);
+          modLabel.attr('title', chromaticisms[index] + " mixture");
+
+        }
         modLabel.html(progression.mod_labeling[index] + "<br /> <span class=''>" + mod_key.toUpperCase() + "</span>");
         chordEl.append(modLabel);
       } else {
