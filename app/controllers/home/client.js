@@ -117,6 +117,7 @@ module.exports = {
    
     var closehistEl = $(".close_hist");
     closehistEl.html("<span class='' />close</span>");
+    closehistEl.addClass("pal");
 
     $(".hist_control").removeClass("active");
     $(".hist_control.mods").addClass("active");
@@ -131,6 +132,7 @@ module.exports = {
   close_histogram: function() {
     OPENED = false;
     var closehistEl = $(".close_hist");
+    closehistEl.addClass("pal");
     closehistEl.html("<span class=''>mods</span>");
     $(".modulation_controls").slideUp();
     $(".modulation_table").removeClass("opened");
@@ -148,7 +150,7 @@ module.exports = {
 
     if (!$(".hist_head").length) {
       // get the hist out of the way
-      var closehistEl = $("<a href='#' class='rfloat close_hist' style='20px; cursor: pointer; text-decoration: underline; color: #ddd;' />");
+      var closehistEl = $("<a href='#' class='rfloat close_hist' style='cursor: pointer; text-decoration: underline; color: #ddd;' />");
       closehistEl.on('click', function(e) {
         module.exports.toggle_histogram();
         e.preventDefault();
@@ -337,7 +339,7 @@ module.exports = {
     function build_hist_el(count, key) {
 
       var histEl = $("<span> </span>");
-      histEl.addClass("pam");
+      histEl.addClass("pal");
       var height_ratio = parseInt(count / max * 100, 10);
       histEl.css({
         "background-color": "#babdb6",

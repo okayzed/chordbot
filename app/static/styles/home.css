@@ -154,6 +154,10 @@ body {
      -ms-user-select: none;      /* IE 10+ */
      user-select: none;          /* Likely future */      
 
+     @media @mobile {
+        width: 14%;
+     }
+
   }
 
   .hist_key_2 {
@@ -161,6 +165,10 @@ body {
     padding-right: 1%;
     padding-left: 1%;
     float: left;
+
+    @media @mobile {
+      width: 26%;
+    }
   }
 
   .hist_head {
@@ -260,6 +268,11 @@ body {
 .close_hist {
   position: absolute;
   right: 10px;
+
+  @media @mobile {
+    top: -30px;
+    background-color: #333;
+  }
 }
 
 .modulation_controls {
