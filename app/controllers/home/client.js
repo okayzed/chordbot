@@ -437,7 +437,9 @@ module.exports = {
       // add something to the chromaticisms?
       if (mixtures.is_mixture(progression.labeling[index])) {
         chordLabel.addClass("mixture_" + chromaticisms[index]);
-        chordLabel.attr('title', chromaticisms[index] + " mixture");
+        if (chromaticisms[index] !== 'original') {
+          chordLabel.attr('title', chromaticisms[index] + " mixture");
+        }
 
       }
 
@@ -636,8 +638,9 @@ module.exports = {
       console.log("KEY", p.key, "HARMONIOUSNESS", analysis.get_progression_harmoniousness(p.mod_labeling), "BREAKS", analysis.check_progression_grammar(p.mod_labeling));
       p.likeliness = analysis.decide_progression_likeliness(p.labeling);
       p.mod_likeliness = analysis.decide_progression_likeliness(p.mod_labeling);
+      var chromaticisms = _.filter(mixtures.find(p.labeling), function(c) { return c !== "original"; });
 
-      return -p.likeliness;
+      return -(p.likeliness - _.keys(chromaticisms).length);
     });
 
     var prog = sorted_progressions[0];
