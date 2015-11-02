@@ -18,6 +18,7 @@ require("app/static/vendor/teoria");
 var analysis = require("app/client/analysis");
 var Progression = require("app/client/progression");
 var normal = require("app/client/normal");
+var mixtures = require("app/client/mixtures");
 var generator = require("app/client/generator");
 
 var BARS_PER_LINE = 8;
@@ -277,41 +278,54 @@ module.exports = {
 
     var mod_breaks = analysis.check_progression_grammar(progression.mod_labeling);
 
-    var likeliness_ratio = parseInt(progression.likeliness / progression.chord_list.length * 100, 10);
-    // likeliness is between 200 and -200 or something
-    var likeEl = controlsEl.find(".likeliness_ratio");
-    likeEl.css("line-height", "2em");
-    if (likeliness_ratio > 150) {
-      likeEl.css("border-bottom", "5px solid #15d115");
-      likeEl.html("great fit");
+    function make_like_el(likeliness, likeEl) {
+      var likeliness_ratio = parseInt(likeliness / progression.chord_list.length * 100, 10);
+      // likeliness is between 200 and -200 or something
+      likeEl.css("line-height", "2em");
+      if (likeliness_ratio > 150) {
+        likeEl.css("border-bottom", "5px solid #15d115");
+        likeEl.html("great fit");
 
-    } else if (likeliness_ratio > 100) {
-      likeEl.css("border-bottom", "5px solid #73d216");
-      likeEl.html("good fit");
-    } else if (likeliness_ratio > 80) {
+      } else if (likeliness_ratio > 100) {
         likeEl.css("border-bottom", "5px solid #73d216");
-        likeEl.html("fit");
-    } else if (likeliness_ratio > 60) {
-        likeEl.css("border-bottom", "5px solid #edd400");
-        likeEl.html("maybe fit?");
-    } else if (likeliness_ratio > 40) {
-      likeEl.css("border-bottom", "5px solid #f57900");
-      likeEl.html("uhhh...");
-    } else if (likeliness_ratio > 0) {
-      likeEl.css("border-bottom", "5px solid #f50000");
-      likeEl.html("pretty unlikely");
-    } else if (likeliness_ratio > -50) {
-      likeEl.css("border-bottom", "5px solid #000");
-      likeEl.html("no way");
+        likeEl.html("good fit");
+      } else if (likeliness_ratio > 80) {
+          likeEl.css("border-bottom", "5px solid #73d216");
+          likeEl.html("fit");
+      } else if (likeliness_ratio > 60) {
+          likeEl.css("border-bottom", "5px solid #edd400");
+          likeEl.html("maybe fit?");
+      } else if (likeliness_ratio > 40) {
+        likeEl.css("border-bottom", "5px solid #f57900");
+        likeEl.html("uhhh...");
+      } else if (likeliness_ratio > 0) {
+        likeEl.css("border-bottom", "5px solid #f50000");
+        likeEl.html("pretty unlikely");
+      } else if (likeliness_ratio > -50) {
+        likeEl.css("border-bottom", "5px solid #000");
+        likeEl.html("no way");
+
+
+      }
+
+      return likeEl;
 
     }
+
+    var likeEl = controlsEl.find(".likeliness_ratio");
+    var modLikeEl = controlsEl.find(".mod_likeliness_ratio");
+    modLikeEl.hide();
+    make_like_el(progression.mod_likeliness, modLikeEl);
+    make_like_el(progression.likeliness, likeEl);
+
+    console.log("LIKELINESSES", progression.likeliness, progression.mod_likeliness);
 
     controlsEl.find(".harmoniousness").html(progression.likeliness);
     controlsEl.find(".mod_harmoniousness").html("NA");
     controlsEl.find(".mod_grammar_breaks").html("NA");
     controlsEl.find(".alternate_key").html("NA");
-    console.log("LIKELINESS RATIO", likeliness_ratio);
     if (progression.mod_likeliness !== progression.likeliness) {
+      modLikeEl.show();
       controlsEl.find(".mod_harmoniousness").html(progression.mod_likeliness);
       controlsEl.find(".mod_grammar_breaks").html(mod_breaks);
       controlsEl.find(".alternate_key").html(_.uniq(_.values(progression.modulations)));
@@ -380,7 +394,8 @@ module.exports = {
     parentEl.append("<hr />");
     var progressionEl = $("<div class='clearfix' />");
     var grammar_breaks = analysis.get_progression_breaks(progression.labeling);
-    var chromaticisms = analysis.find_mixtures(progression.labeling);
+    var chromaticisms = mixtures.find(progression.labeling);
+    var mod_chromaticisms = mixtures.find(progression.mod_labeling);
 
     _.each(progression.chord_list, function(chord, index) {
       if (index && index % BARS_PER_LINE == 0) {
@@ -420,7 +435,7 @@ module.exports = {
       });
 
       // add something to the chromaticisms?
-      if (analysis.is_mixture(progression.labeling[index])) {
+      if (mixtures.is_mixture(progression.labeling[index])) {
         chordLabel.addClass("mixture_" + chromaticisms[index]);
         chordLabel.attr('title', chromaticisms[index] + " mixture");
 
@@ -433,9 +448,9 @@ module.exports = {
 
       if (progression.mod_labeling[index] !== progression.labeling[index]) {
         var modLabel = $("<div class='mod_label'/>");
-        if (analysis.is_mixture(progression.mod_labeling[index])) {
-          modLabel.addClass("mixture_" + chromaticisms[index]);
-          modLabel.attr('title', chromaticisms[index] + " mixture");
+        if (mixtures.is_mixture(progression.mod_labeling[index])) {
+          modLabel.addClass("mixture_" + mod_chromaticisms[index]);
+          modLabel.attr('title', mod_chromaticisms[index] + " mixture");
 
         }
         modLabel.html(progression.mod_labeling[index] + "<br /> <span class=''>" + mod_key.toUpperCase() + "</span>");
@@ -622,8 +637,7 @@ module.exports = {
       p.likeliness = analysis.decide_progression_likeliness(p.labeling);
       p.mod_likeliness = analysis.decide_progression_likeliness(p.mod_labeling);
 
-      var front_likely = analysis.decide_progression_likeliness(p.labeling.slice(0, 4));
-      return -front_likely;
+      return -p.likeliness;
     });
 
     var prog = sorted_progressions[0];

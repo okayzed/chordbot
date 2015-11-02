@@ -3,6 +3,7 @@ var Progression = require("app/client/progression");
 // http://www.dangutwein.net/courses/mus201/handouts/har_mot.htm
 var MAJOR_GRAMMAR = "iii | vi | ii IV | V vii | I";
 var MINOR_GRAMMAR = "III | VI vi | ii IV iv | v V vii | I";
+var mixtures = require("app/client/mixtures");
 
 var CHORDS_IN_KEY = {};
 
@@ -180,6 +181,8 @@ function get_progression_candidates(chord, key) {
 
 var cached_grammar_checks = {};
 function check_progression_grammar(labeling) {
+  labeling = mixtures.replace(labeling);
+
   var prev_chord;
   var misses = 0;
   var breaks = 0;
