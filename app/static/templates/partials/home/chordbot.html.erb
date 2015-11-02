@@ -10,19 +10,20 @@
     "D D D D D D am7 D7/A G G D bm D A7 D "
   ];
 %>
+<div class='clearfix'>
 
-
-  <form class='form' style='margin-top: 20px'>
+  <form class='form clearfix' style='margin-top: 20px'>
     <textarea class='form-control' style='width: 100%'><%= examples[_.random(examples.length-1)] %></textarea>
   </form>
 
-  <div class='mtl btn btn-default analyze' style='font-family: monospace; width: 50%;'>
+  <div class='mtl btn btn-default analyze col-md-6 col-xs-6' style='font-family: monospace'>
     FEED CHORD BOT
   </div>
-  <div class='mtl btn btn-default play rfloat mbl' style='font-family: monospace; width: 24%;'>
+  <div class='mtl btn btn-default play rfloat mbl col-md-3 col-xs-3' style='font-family: monospace;'>
     PLAY
   </div>
-  <div class='mtl btn btn-default rfloat mbl' style='font-family: monospace; width: 24%;' data-toggle="collapse" data-target=".not_that_helpful_info">
+  <div class='mtl btn btn-default rfloat mbl col-md-3 col-xs-3' style='font-family: monospace;' data-toggle="collapse" data-target=".not_that_helpful_info">
     WHAT NEXT?
   </div>
 
+</div>
