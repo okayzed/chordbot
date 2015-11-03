@@ -2,7 +2,7 @@ var Progression = require("app/client/progression");
 // grammar is from chord grammar and info on
 // http://www.dangutwein.net/courses/mus201/handouts/har_mot.htm
 var MAJOR_GRAMMAR = "iii | vi | ii IV | V vii | I";
-var MINOR_GRAMMAR = "III | VI vi | ii IV iv | v V vii | I";
+var MINOR_GRAMMAR = "III | VI vi | ii IV iv | v V vii | Im i";
 var mixtures = require("app/client/mixtures");
 
 var CHORDS_IN_KEY = {};
@@ -160,7 +160,7 @@ function get_progression_candidates(chord, key) {
       candidates[key] = 1;
     });
 
-  } else if (func === "Im" && GRAMMARS.minor) {
+  } else if ((func === "Im" || func === "i") && GRAMMARS.minor) {
     _.each(GRAMMARS.minor.matrix, function(val, key) {
       candidates[key] = 1;
     });
