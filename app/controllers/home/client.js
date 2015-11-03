@@ -33,6 +33,46 @@ function clean_line(line) {
   return lines.join(" ");
 }
 
+function get_func_name(func) {
+  var flats = 0;
+  var sharps = 0;
+
+  while (func.indexOf("b") === 0) {
+    func = func.slice(1);
+    flats++;
+  }
+
+  while (func.indexOf("#") === 0) {
+    func = func.slice(1);
+    sharps++;
+  }
+
+  if (func.indexOf("m") > 0) {
+    func = func.toLowerCase();
+    func = func.replace(/m/, "");
+
+  }
+
+  if (func.indexOf("M") > 0) {
+    func = func.toUpperCase();
+    func = func.replace(/M/, "");
+  }
+
+  while (flats > 0) {
+    func = 'b' + func; 
+    flats--;
+  }
+
+  while (sharps > 0) {
+    func = '#' + func; 
+    sharps--;
+
+  } 
+
+  return func;
+
+}
+
 function get_chord_classname(chord) {
   return analysis.get_simple_key(chord).replace("#", "s");
 }
@@ -318,8 +358,6 @@ module.exports = {
     make_like_el(progression.mod_likeliness, modLikeEl);
     make_like_el(progression.likeliness, likeEl);
 
-    console.log("LIKELINESSES", progression.likeliness, progression.mod_likeliness);
-
     controlsEl.find(".harmoniousness").html(progression.likeliness);
     controlsEl.find(".mod_harmoniousness").html("NA");
     controlsEl.find(".mod_grammar_breaks").html("NA");
@@ -421,7 +459,7 @@ module.exports = {
       var current_key = progression.key;
       var mod_key = progression.modulations[index] || current_key;
       var chordLabel = $("<div class='function_label rfloat'/>");
-      chordLabel.html(progression.labeling[index] + "<br /> <span class=''>" + get_chord_name(current_key) + "</span>");
+      chordLabel.html(get_func_name(progression.labeling[index]) + "<br /> <span class=''>" + get_chord_name(current_key) + "</span>");
 
       chordEl.text(progression.chord_list[index] + " (" + get_chord_name(progression.chord_list[index]) + ")");
 
@@ -455,7 +493,7 @@ module.exports = {
           modLabel.attr('title', mod_chromaticisms[index] + " mixture");
 
         }
-        modLabel.html(progression.mod_labeling[index] + "<br /> <span class=''>" + mod_key.toUpperCase() + "</span>");
+        modLabel.html(get_func_name(progression.mod_labeling[index]) + "<br /> <span class=''>" + mod_key.toUpperCase() + "</span>");
         chordEl.append(modLabel);
       } else {
         chordEl.append("<div>&nbsp;</div>");
