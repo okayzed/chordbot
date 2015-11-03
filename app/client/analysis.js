@@ -113,7 +113,10 @@ var MIN_KEYS = ["vii", "Im", "ii", "III", "iv", "VI", "V" ];
 var cached_labelings = {};
 
 var cached_harmoniousness = {};
+var mixtures = require("app/client/mixtures");
+
 function get_progression_harmoniousness(labeling) {
+  labeling = mixtures.replace(labeling);
   var maj_points = 0, min_points = 0;
   var labeling_key = labeling.join(",");
   if (cached_harmoniousness[labeling_key]) {

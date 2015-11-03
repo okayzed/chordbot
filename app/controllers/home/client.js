@@ -322,6 +322,7 @@ module.exports = {
       var likeliness_ratio = parseInt(likeliness / progression.chord_list.length * 100, 10);
       // likeliness is between 200 and -200 or something
       likeEl.css("line-height", "2em");
+      likeEl.css("height", "50px");
       if (likeliness_ratio > 150) {
         likeEl.css("border-bottom", "5px solid #15d115");
         likeEl.html("great fit");
