@@ -16,6 +16,7 @@
 require("app/static/vendor/teoria");
 
 var analysis = require("app/client/analysis");
+var grammar_matrix = require("app/client/grammar_matrix");
 var Progression = require("app/client/progression");
 var normal = require("app/client/normal");
 var mixtures = require("app/client/mixtures");
@@ -74,12 +75,12 @@ function get_func_name(func) {
 }
 
 function get_chord_classname(chord) {
-  return analysis.get_simple_key(chord).replace("#", "s");
+  return normal.get_simple_key(chord).replace("#", "s");
 }
 
 function get_chord_name(chord) {
   try {
-    var chord_name = analysis.get_flavored_key(chord);
+    var chord_name = normal.get_flavored_key(chord);
     chord_name = chord_name[0].toUpperCase() + chord_name.slice(1);
     return chord_name.replace("dom", "7").replace("dim", "d").replace("M", "");
   } catch(e) {
@@ -232,14 +233,14 @@ module.exports = {
       rowEl.addClass("hist_row");
       rowEl.addClass("key_" + get_chord_classname(key));
       rowEl.attr("data-key", key);
-      key = analysis.get_simple_key(key);
+      key = normal.get_simple_key(key);
 
       if ($(".key_" + get_chord_classname(key)).length) {
         return;
       }
 
       var funcession = [ "I", "vii", "V", "ii", "IV", "vi", "iii" ];
-      if (!analysis.chord_is_major(key)) {
+      if (!normal.chord_is_major(key)) {
         funcession =   [ "Im", "vii", "V", "ii", "iv", "VI", "III" ];
       }
       funcession.reverse();
@@ -530,7 +531,7 @@ module.exports = {
             synth.play_chord(progression.chord_list[index]);
           } catch(e) {
             console.log("CANT PLAY CHORD", e, progression.chord_list[index]);
-            synth.play_chord(analysis.get_flavored_key(progression.chord_list[index]));
+            synth.play_chord(normal.get_flavored_key(progression.chord_list[index]));
           }
         });
       });
@@ -567,7 +568,7 @@ module.exports = {
 
     // For any given chord, we find it's relative modulations...
     // and we find the modulations based on current key / destination key
-    var relatives = relative_modulations[analysis.get_simple_key(chord)];
+    var relatives = relative_modulations[normal.get_simple_key(chord)];
 
     // For available...
     var available = [
@@ -577,7 +578,7 @@ module.exports = {
     ];
 
     _.each(common_chord_modulations[current_key + "M"], function(chords, dest_key) {
-      var chord_key = analysis.get_simple_key(chord);
+      var chord_key = normal.get_simple_key(chord);
       if (chords[chord_key]) {
         available.push([dest_key, get_chord_name(chord_key), chords[chord_key]]);
       }
@@ -588,10 +589,10 @@ module.exports = {
       chordEl.addClass("relative");
     });
 
-    var chord_key = analysis.get_simple_key(chord);
-    var keys_with_chord = bootloader.require("app/client/grammar").KEYS_WITH_CHORD[chord_key];
+    var chord_key = normal.get_simple_key(chord);
+    var keys_with_chord = grammar_matrix.KEYS_WITH_CHORD[chord_key];
     _.each(keys_with_chord, function(interval, dest_key) {
-        available.push([analysis.get_flavored_key(dest_key), chord_key, []]);
+        available.push([normal.get_flavored_key(dest_key), chord_key, []]);
     });
 
     $(".chord_" + get_chord_classname(chord)).addClass("current");

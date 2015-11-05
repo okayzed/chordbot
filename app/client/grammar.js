@@ -4,14 +4,22 @@ var Progression = require("app/client/progression");
 var MAJOR_GRAMMAR = "iii | vi | ii IV | V vii | I";
 var MINOR_GRAMMAR = "III | VI vi | ii IV iv | v V vii | Im i";
 var mixtures = require("app/client/mixtures");
+var grammar_matrix = require("app/client/grammar_matrix");
 
 var CHORDS_IN_KEY = {};
 
 // KEYS HAVE CHORD IS A LOOKUP THAT SHOWS WHAT OTHER KEYS CONTAIN A CHORD AND
 // WHAT ITS FUNCTION IS
 var KEYS_HAVE_CHORD = {};
-
 var FUNCTIONS_FOR_KEY = {};
+
+
+// Export some data structures into grammar matrix file so we can share it
+// without sharing too much other deps
+grammar_matrix.KEYS_HAVE_CHORD = KEYS_HAVE_CHORD;
+grammar_matrix.KEYS_WITH_CHORD = KEYS_HAVE_CHORD;
+grammar_matrix.FUNCTIONS_FOR_KEY = FUNCTIONS_FOR_KEY;
+grammar_matrix.CHORDS_IN_KEY = CHORDS_IN_KEY;
 
 
 var lookup = {

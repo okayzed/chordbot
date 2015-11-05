@@ -1,4 +1,7 @@
 
+var normal = require("app/client/normal");
+var grammar = require("app/client/grammar_matrix");
+
 var major_progression = [ "I", "ii", "iii", "IV", "V", "vi", "vii" ];
 var minor_progression = [ "Im", "ii", "III", "iv", "V", "VI", "vii" ];
 
@@ -9,128 +12,117 @@ module.exports = {
     var acc = -1;
     var chord_name;
     var quality;
-    bootloader.js(["app/client/grammar", "app/client/analysis"], function() {
-      var grammar = bootloader.require("app/client/grammar");
-      var analysis = bootloader.require("app/client/analysis");
 
-      if (func.match(/m$/)) {
-        quality = "m";
-      }
-      if (func.match(/M$/)) {
-        quality = "M";
-      }
-      func = func.replace(/[mM]$/, "");
+    if (func.match(/m$/)) {
+      quality = "m";
+    }
+    if (func.match(/M$/)) {
+      quality = "M";
+    }
+    func = func.replace(/[mM]$/, "");
 
 
 
-      acc = 0;
-      while (func.match(/b/)) {
-        func = func.replace(/b/, '');
-        acc--;
-      }
-      while (func.match(/#/)) {
-        func = func.replace(/#/, '');
-        acc++;
-      }
+    acc = 0;
+    while (func.match(/b/)) {
+      func = func.replace(/b/, '');
+      acc--;
+    }
+    while (func.match(/#/)) {
+      func = func.replace(/#/, '');
+      acc++;
+    }
 
-      // now we expect it to be in form [vViI]7?
-      var match = func.match(/[VviI]+7?/);
-      if (match.indexOf("7") !== -1) {
-        // its a 7th chord!
-        func.replace("7", "");
-      }
+    // now we expect it to be in form [vViI]7?
+    var match = func.match(/[VviI]+7?/);
+    if (match.indexOf("7") !== -1) {
+      // its a 7th chord!
+      func.replace("7", "");
+    }
 
-      var chord_key = analysis.get_flavored_key(root);
-      var simple_key = analysis.get_chord_key(root);
+    var chord_key = normal.get_flavored_key(root);
+    var simple_key = normal.get_chord_key(root);
 
-      if (grammar.FUNCTIONS_FOR_KEY[chord_key]) {
-        chord_name = grammar.FUNCTIONS_FOR_KEY[chord_key][func];
-      }
+    if (grammar.FUNCTIONS_FOR_KEY[chord_key]) {
+      chord_name = grammar.FUNCTIONS_FOR_KEY[chord_key][func];
+    }
 
+    if (!chord_name) {
+      chord_name = grammar.FUNCTIONS_FOR_KEY[simple_key][func];
+    }
+
+    if (chord_name) {
+      chord_name = normal.get_flavored_key(chord_name, quality);
+    }
+
+    // maybe we try one more time, but inverting values...
+    if (!chord_name) {
+      func = func.toUpperCase();
+      chord_name = grammar.FUNCTIONS_FOR_KEY[chord_key][func];
       if (!chord_name) {
         chord_name = grammar.FUNCTIONS_FOR_KEY[simple_key][func];
       }
 
       if (chord_name) {
-        chord_name = analysis.get_flavored_key(chord_name, quality);
+        chord_name = normal.get_flavored_key(chord_name, quality || "m");
+      }
+    } 
+
+    if (!chord_name) {
+      func = func.toLowerCase();
+      chord_name = grammar.FUNCTIONS_FOR_KEY[chord_key][func];
+      if (!chord_name) {
+        chord_name = grammar.FUNCTIONS_FOR_KEY[simple_key][func];
       }
 
-      // maybe we try one more time, but inverting values...
-      if (!chord_name) {
-        func = func.toUpperCase();
-        chord_name = grammar.FUNCTIONS_FOR_KEY[chord_key][func];
-        if (!chord_name) {
-          chord_name = grammar.FUNCTIONS_FOR_KEY[simple_key][func];
-        }
-
-        if (chord_name) {
-          chord_name = analysis.get_flavored_key(chord_name, quality || "m");
-        }
-      } 
-
-      if (!chord_name) {
-        func = func.toLowerCase();
-        chord_name = grammar.FUNCTIONS_FOR_KEY[chord_key][func];
-        if (!chord_name) {
-          chord_name = grammar.FUNCTIONS_FOR_KEY[simple_key][func];
-        }
-
-        if (chord_name) {
-          chord_name = analysis.get_flavored_key(chord_name, quality || "M");
-        }
-
+      if (chord_name) {
+        chord_name = normal.get_flavored_key(chord_name, quality || "M");
       }
 
-    });
+    }
+
 
     // Need to release the accumulator...
     if (!acc) {
       return chord_name;
     }
 
-    bootloader.js("app/client/analysis", function() {
-      var analysis = bootloader.require("app/client/analysis");
-      while (acc != 0) {
-        var delta = 1;
-        if (acc > 0) {
-          delta = -1;
-        }
-
-        acc += delta;
-        var orig_name = chord_name;
-
-        var chord = teoria.chord(chord_name);
-        var chord_quality = quality || "M";
-        if (chord.quality() == "minor") {
-          chord_quality = "m";
-        }
-
-        if (delta > 0) {
-          chord_name = analysis.get_chord_key(chord_name) + "b" + chord_quality;
-        } else {
-          chord_name = analysis.get_chord_key(chord_name) + "#" + chord_quality;
-        }
-
-        if (chord_name.indexOf("bb") > 0) {
-          var chord_note = teoria.note(analysis.get_chord_key(chord_name));
-          chord_note.transpose(teoria.interval("M7"));
-          chord_name = analysis.get_chord_key(teoria.chord(chord_note.name())) + chord_quality;
-        } else if (chord_name.indexOf("##") !== -1) {
-          var chord_note = teoria.note(analysis.get_chord_key(chord_name));
-          chord_note.transpose(teoria.interval("M2"));
-          chord_name = analysis.get_chord_key(teoria.chord(chord_note.name())) + chord_quality;
-
-        }
-        chord_name = chord_name.replace(/#b/, '');
-
+    while (acc != 0) {
+      var delta = 1;
+      if (acc > 0) {
+        delta = -1;
       }
 
+      acc += delta;
+      var orig_name = chord_name;
 
-    });
+      var chord = teoria.chord(chord_name);
+      var chord_quality = quality || "M";
+      if (chord.quality() == "minor") {
+        chord_quality = "m";
+      }
+
+      if (delta > 0) {
+        chord_name = normal.get_chord_key(chord_name) + "b" + chord_quality;
+      } else {
+        chord_name = normal.get_chord_key(chord_name) + "#" + chord_quality;
+      }
+
+      if (chord_name.indexOf("bb") > 0) {
+        var chord_note = teoria.note(normal.get_chord_key(chord_name));
+        chord_note.transpose(teoria.interval("M7"));
+        chord_name = normal.get_chord_key(teoria.chord(chord_note.name())) + chord_quality;
+      } else if (chord_name.indexOf("##") !== -1) {
+        var chord_note = teoria.note(normal.get_chord_key(chord_name));
+        chord_note.transpose(teoria.interval("M2"));
+        chord_name = normal.get_chord_key(teoria.chord(chord_note.name())) + chord_quality;
+
+      }
+      chord_name = chord_name.replace(/#b/, '');
+
+    }
 
     return chord_name;
-
-    
 
   },
   determine_function: function(chord, root) {   

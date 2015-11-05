@@ -1,6 +1,7 @@
 "use strict";
 
 var analysis = require("app/client/analysis");
+var normal = require("app/client/normal");
 var grammar = require("app/client/grammar");
 var Progression = require("app/client/progression");
 
@@ -8,12 +9,12 @@ function get_chord_names(intersected, mod_key) {
   if (intersected.length) {
     var intersected_with_names = [];
     _.each(intersected, function(chord) {
-      if (analysis.get_chord_key(chord) === analysis.get_chord_key(mod_key)) {
+      if (normal.get_chord_key(chord) === normal.get_chord_key(mod_key)) {
         return;
       }
 
       intersected_with_names.push([chord, Progression.determine_function(chord,
-        analysis.get_chord_key(mod_key))]);
+        normal.get_chord_key(mod_key))]);
 
     });
 
@@ -38,16 +39,16 @@ function get_intersection(chord_key, current_key, mod_key) {
     if (!mc) {
       return;
     }
-    intersected[analysis.get_simple_key(mc)] = mc;
+    intersected[normal.get_simple_key(mc)] = mc;
   });
 
   _.each(candidate_chords, function(c) {
     if (!c) {
       return;
     }
-    if (intersected[analysis.get_simple_key(c)]) {
+    if (intersected[normal.get_simple_key(c)]) {
       candidates.push(c);
-      candidates.push(intersected[analysis.get_simple_key(c)]);
+      candidates.push(intersected[normal.get_simple_key(c)]);
     }
 
   });
@@ -88,18 +89,18 @@ function get_common_chord_modulations(progression) {
       checked_keys[checked_key] = true;
 
 
-      var chord_key = analysis.get_flavored_key(chord);
+      var chord_key = normal.get_flavored_key(chord);
       var relatives = relative_modulations[chord_key];
       if (!relatives) {
-        var simple_key = analysis.get_chord_key(chord) + "M";
+        var simple_key = normal.get_chord_key(chord) + "M";
         relatives = relative_modulations[simple_key];
       } else {
         relatives[chord_key] = 'original';
       }
 
       _.each(relatives, function(reason, relative) {
-        var flavored_key = analysis.get_flavored_key(relative);
-        var chord_key = analysis.get_simple_key(relative);
+        var flavored_key = normal.get_flavored_key(relative);
+        var chord_key = normal.get_simple_key(relative);
 
         var keys_with_chords = grammar.KEYS_WITH_CHORD[chord_key];
         var other_keys_with_chords = grammar.KEYS_WITH_CHORD[flavored_key];
@@ -111,7 +112,7 @@ function get_common_chord_modulations(progression) {
 
 
         _.each(keys_with_chords, function(index, mod_key) {
-          var intersected = get_intersection(chord_key, analysis.get_chord_key(current_key), mod_key);
+          var intersected = get_intersection(chord_key, normal.get_chord_key(current_key), mod_key);
           var intersected_with_names = get_chord_names(intersected, mod_key);
 
           if (!candidates[current_key + "M"]) { candidates[current_key + "M"] = {}; }
@@ -141,24 +142,24 @@ function get_relative_modulations(progression) {
   var candidates = {};
   var chord_set = _.uniq(progression.chord_list);
   _.each(chord_set, function(chord) {
-    var chord_key = analysis.get_chord_key(chord);
+    var chord_key = normal.get_chord_key(chord);
     var chord_quality = "M";
-    if (!analysis.chord_is_major(chord)) {
+    if (!normal.chord_is_major(chord)) {
       chord_quality = "m";
     }
 
     candidates[chord_key + chord_quality] = {};
-    if (analysis.chord_is_major(chord)) {
+    if (normal.chord_is_major(chord)) {
       candidates[chord_key + chord_quality][chord_key + "m"] = "p. min";
       var relative = teoria.note(chord_key).interval("M6");
       candidates[chord_key + chord_quality][relative.name() + relative.accidental() + "m"] = "r. min";
 
       if (chord.quality() == "dominant") {
-        var implied_key = analysis.get_chord_key(teoria.note(chord_key).interval("P4").name());
+        var implied_key = normal.get_chord_key(teoria.note(chord_key).interval("P4").name());
         candidates[chord_key + chord_quality][chord_key + "7"] = "original";
         candidates[chord_key + chord_quality][implied_key + "M"] = "res 7";
       } else {
-        var implied_key = analysis.get_chord_key(teoria.note(chord_key).interval("P4").name());
+        var implied_key = normal.get_chord_key(teoria.note(chord_key).interval("P4").name());
         candidates[chord_key + chord_quality][chord_key + "7"] = "dom7";
         candidates[chord_key + chord_quality][implied_key + "M"] = "res7";
 

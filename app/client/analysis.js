@@ -1,59 +1,9 @@
 var grammar = require("app/client/grammar");
+var normal = require("app/client/normal");
 
 var major_progression = [ "I", "ii", "iii", "IV", "V", "vi", "vii" ];
 var minor_progression = [ "Im", "ii", "iii", "iv", "V", "VI", "vii" ];
 var Progression = require("app/client/progression");
-
-var MIN_SUFFIX = "m";
-var MAJ_SUFFIX = "M";
-var DOM_SUFFIX = "dom";
-var DIM_SUFFIX = "dim";
-var AUG_SUFFIX = "+";
-
-function get_simple_key(chord_ish) {
-  var quality = "m";
-  if (module.exports.chord_is_major(chord_ish)) {
-    quality = "M";
-  }
-
-  return module.exports.get_chord_key(chord_ish) + quality;
-}
-
-function get_flavored_key(chord_ish, flavor) {
-  if (typeof(chord_ish) === "string") {
-    chord_ish = teoria.chord(chord_ish);
-  }
-
-  if (chord_ish.root) {
-    if (!flavor) {
-      var quality = chord_ish.quality();
-      flavor = MAJ_SUFFIX;
-      if (quality === "minor") {
-        flavor = MIN_SUFFIX;
-      }
-
-      if (quality === "diminished") {
-        flavor = DIM_SUFFIX;
-      }
-
-      if (quality === "dominant") {
-        flavor = DOM_SUFFIX;
-      }
-
-      if (quality === "augmented") {
-        flavor = AUG_SUFFIX;
-      }
-    }
-
-    return chord_ish.root.name() + chord_ish.root.accidental() + flavor;
-  }
-
-  flavor = flavor || "M";
-  return chord_ish.name() + chord_ish.accidental() + flavor;
-
-
-
-}
 
 function Counter() {
   var count = {};
@@ -243,9 +193,9 @@ function find_modulation_candidates(progression) {
 }
 
 function get_progression_candidate_chords(chord, key) {
-  var candidates = grammar.get_progression_candidates(chord, module.exports.get_chord_key(key));
+  var candidates = grammar.get_progression_candidates(chord, normal.get_chord_key(key));
   return _.map(candidates, function(candidate) {
-    return Progression.get_chord_for_function(candidate, module.exports.get_flavored_key(key));
+    return Progression.get_chord_for_function(candidate, normal.get_flavored_key(key));
   });
 }
 
@@ -323,20 +273,6 @@ module.exports = {
   decide_progression_likeliness: decide_progression_likeliness,
   get_progression_harmoniousness: get_progression_harmoniousness,
   check_progression_grammar: check_progression_grammar,
-  chord_is_major: function(chord_ish) {
-    var name = module.exports.get_flavored_key(chord_ish);
-    if (name.match("M") || name.match(DOM_SUFFIX)) {
-      return true;
-    }
-  },
-  get_chord_key: function(chord_ish) {
-    if (typeof(chord_ish) === "string") {
-      chord_ish = teoria.chord(chord_ish);
-    }
-
-    return chord_ish.root.name() + chord_ish.root.accidental();
-  },
-  get_flavored_key: get_flavored_key,
   get_chord_histograms: function(progression) {
     var key_hist = new Counter();
     var implied_hist = new Counter();
@@ -351,18 +287,18 @@ module.exports = {
         // histogram of chord keys
 
         if (chord.quality() == "major" || chord.quality() == "dominant") {
-          key_hist.add(get_flavored_key(chord, "M"));
+          key_hist.add(normal.get_flavored_key(chord, "M"));
           // add the implied minor to the implied_hist...
           relative = chord.root.interval("M6");
-          implied_hist.add(get_flavored_key(relative, "m"));
+          implied_hist.add(normal.get_flavored_key(relative, "m"));
         } else if (chord.quality() == "minor") {
-          key_hist.add(get_flavored_key(chord, "m"));
+          key_hist.add(normal.get_flavored_key(chord, "m"));
           relative = chord.root.interval("m3");
-          implied_hist.add(get_flavored_key(relative, "m"));
+          implied_hist.add(normal.get_flavored_key(relative, "m"));
         } else if (chord.quality() == "diminished") {
-          key_hist.add(get_flavored_key(chord, "dim"));
+          key_hist.add(normal.get_flavored_key(chord, "dim"));
           relative = chord.root.interval("m3");
-          implied_hist.add(get_flavored_key(relative, "dim"));
+          implied_hist.add(normal.get_flavored_key(relative, "dim"));
 
         }
       });
@@ -385,7 +321,6 @@ module.exports = {
   },
   get_progression_breaks: get_progression_breaks,
   get_progression_candidate_chords: get_progression_candidate_chords,
-  get_simple_key: get_simple_key,
   use_blues_grammar: function() {
     module.exports.reset();
     grammar.add_grammar("blues", "IV iv v V Vm | v V IV | I");
